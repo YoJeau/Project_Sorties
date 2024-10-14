@@ -15,6 +15,4 @@ Symfony 6.4
 
 ##
 Bootstrap 5.3
-
-##
 Bootswatch Theme: [Vapor](https://bootswatch.com/vapor/)
