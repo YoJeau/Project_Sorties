@@ -50,7 +50,7 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $parPicture = null;
 
     #[ORM\Column]
-    private ?boolean $parIsActive;
+    private ?bool $parIsActive;
 
     /**
      * @var Collection<int, Subscribe>
