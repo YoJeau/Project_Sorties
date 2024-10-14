@@ -13,9 +13,7 @@ Bootstrap 5.3
 Bootswatch Theme: [Vapor](https://bootswatch.com/vapor/)
 
 ##
-MySQL 8.3.
-
-MariaDB 11.3.2
+MySQL 8.3.0
 
 Table Trip {  
 tri_id integer [primary key]  
