@@ -1,0 +1,62 @@
+<div class="container">
+    <table class="table table-hover" name="trip-list" id="trip-list">
+        <thead class="border border-primary">
+            <th scope="col">Nom de la sortie</th>
+            <th scope="col">Date de la sortie</th>
+            <th scope="col">Clôture</th>
+            <th scope="col">Inscrits/place</th>
+            <th scope="col">Etat</th>
+            <th scope="col">Inscrit</th>
+            <th scope="col">Organisateur</th>
+            <th scope="col"> Actions</th>
+        </thead>
+        <tbody>
+            {% if trips|length > 0 %}
+            {%  set classColor = {
+            'Terminée' : "table-dark",
+            'Ouverte' : "table-light",
+            'En Création' : "table-primary",
+            'Clôturée' : "table-warning",
+            'Annulée' : "table-danger",
+            'Fermée' : "table-secondary",
+            'En Cours':'table-success'
+            } %}
+            {% for trip in trips %}
+            <tr class="table-dark" data-trip-id="{{ trip.getId() }}">
+                <td>{{ trip.getTriName() }}</td>
+                <td>{{ trip.getTriStartingDate()|date("m/d/Y") }}</td>
+                <td>{{ trip.getTriClosingDate()|date("m/d/Y") }}</td>
+                <td>{{ trip.getTriSubscribes()|length }}/{{ trip.getTriMaxInscriptionNumber() }}</td>
+                <td class="{{ classColor[trip.getTriState().getStaLabel()] }}">{{ trip.getTriState().getStaLabel() }}</td>
+                <td>
+                    {% set userIsSubscribed = false %}
+                    {% for subscribe in trip.getTriSubscribes() %}
+                    {% if subscribe.getSubParticipantId() == app.user %}
+                    {% set userIsSubscribed = true %}
+                    {% endif %}
+                    {% endfor %}
+                    {% if userIsSubscribed %}
+                    <span class="badge rounded-pill bg-info">Inscrit</span>
+                    {% endif %}
+                </td>
+                <td>{{ trip.getTriOrganiser().getParFirstName() }} {{ trip.getTriOrganiser().getParLastName() }}</td>
+                <td>
+                    {% for action in actions %}
+                    {% if action['tripId'] == trip.getId() %}
+                    {{ action['action']|raw }}
+                    {% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr class="table-warning">
+                <td colspan="8" class="text-center">Aucune sortie disponible</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+<div class="d-flex justify-content-center">
+    {{ knp_pagination_render(trips) }}
+</div>

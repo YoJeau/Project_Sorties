@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Service;
 
 class ActionService
@@ -10,123 +9,74 @@ class ActionService
      * @param User $user   L'utilisateur.
      * @param Trip[] $trips Un tableau d'objets Trip.
      */
-    public function determineAction($user,$trips){
+    public function determineAction($user, $trips): array
+    {
         $actions = [];
-        foreach($trips as $row){
-            $isSubcribed = $this->isSubscribed($user,$row);
-            $isOrganisator = $this->isOrganisator($user,$row);
-            $checkSubcribe = $this->checkSubcribe($row);
+        foreach ($trips as $row) {
+            $isSubcribed = $this->isSubscribed($user, $row);
+            $isOrganisator = $this->isOrganisator($user, $row);
+            $state = $row->getTriState()->getStaLabel(); // Récupère l'état du voyage
 
-            $isClosed = $this->isClosed($row);
-            $isClosedSubDate = $this->isClosedSubDate($isClosed,$isSubcribed,$row);
-            $isOpenAndSub = $this->isOpenAndSub($isSubcribed,$row);
-            $isOpenAndNotSub = $this-> isOpenAndNotSub($isSubcribed,$checkSubcribe,$row);
-            $isCreatedAndOrganisator = $this->isCreatedAndOrganisator($isOrganisator,$row);
-            $isOpenAndOrganisator = $this->isOpenAndOrganisator($isOrganisator,$row);
             $actions[] = [
                 "tripId" => $row->getId(),
-                "action" => $this->chooseAction(
-                    $isClosed,
-                    $isClosedSubDate,
-                    $isOpenAndSub,
-                    $isOpenAndNotSub,
-                    $isCreatedAndOrganisator,
-                    $isOpenAndOrganisator
-                )
+                "action" => $this->chooseAction($state, $isSubcribed, $isOrganisator)
             ];
         }
-        dd($actions);
         return $actions;
     }
 
-    public function isSubscribed($user,$row){
-
-        foreach($row->getTriSubscribes() as $subscribes){
-            if($subscribes->getSubParticipantId()->getId() == $user->getId()){
+    public function isSubscribed($user, $row): bool
+    {
+        foreach ($row->getTriSubscribes() as $subscribes) {
+            if ($subscribes->getSubParticipantId()->getId() == $user->getId()) {
                 return true;
             }
-            return false;
         }
         return false;
     }
 
-    public function isOrganisator($user,$row){
-        if($row->getTriOrganiser()->getId() == $user->getId()){
-            return true;
-        }
-        return false;
-    }
-
-    public function checkSubcribe($row){
-        $currentDate = new \DateTime();
-        if($currentDate > $row->getTriClosingDate() || count($row->getTriSubscribes()) == $row->getTriMaxInscriptionNumber()){
-            return false;
-        }
-        return true;
-    }
-
-    public function isClosed($row){
-        if($row->getTriState()->getStaLabel() === 'Clôturée') return true;
-        return false;
-    }
-
-    public function isClosedSubDate($isClosed,$isSubcribe,$row){
-        $currentDate = new \DateTime();
-        if($isClosed && $isSubcribe && $currentDate < $row->getTriClosingDate()) return true;
-        return false;
-    }
-
-    public function isOpenAndSub($isSubcribe,$row){
-        if($isSubcribe && $row->getTriState()->getStaLabel() === 'Ouverte') return true;
-        return false;
-    }
-
-    public function isOpenAndNotSub($isSubcribe,$checkSubcribe,$row){
-        if(!$isSubcribe && !$row->getTriState()->getStaLabel() === 'Ouverte' && $checkSubcribe) return true;
-        return false;
-    }
-
-    public function isCreatedAndOrganisator($isOrganisator,$row){
-        if($isOrganisator && $row->getTriState()->getStaLabel() === 'Créée') return true;
-        return false;
-    }
-
-    public function isOpenAndOrganisator($isOrganisator,$row){
-        if($isOrganisator && $row->getTriState()->getStaLabel() === 'Ouverte') return true;
-        return false;
-    }
-
-    public function chooseAction($isClosed, $isClosedSubDate, $isOpenAndSub, $isOpenAndNotSub, $isCreatedAndOrganisator, $isOpenAndOrganisator)
+    public function isOrganisator($user, $row): bool
     {
-        // Débogage : affichage des valeurs des états
-//        dump(compact('isClosed', 'isClosedSubDate', 'isOpenAndSub', 'isOpenAndNotSub', 'isCreatedAndOrganisator', 'isOpenAndOrganisator'));
+        return $row->getTriOrganiser()->getId() == $user->getId();
+    }
 
-        if ($isClosed) {
-            return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>";
-        }
+    public function chooseAction($state, $isSubcribed, $isOrganisator)
+    {
+        switch ($state) {
+            case 'Ouverte':
+                if ($isSubcribed) {
+                    return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>
+                            <a href=''> <span class='badge rounded-pill bg-info'>Se désister</span></a>";
+                } else if ($isOrganisator) {
+                    return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>
+                            <a href=''> <span class='badge rounded-pill bg-info'>Annuler</span></a>";
+                }
+                else {
+                    return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>
+                            <a href=''> <span class='badge rounded-pill bg-info'>S'inscrire</span></a>";
+                }
 
-        if ($isClosedSubDate) {
-            return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>
-                <a href=''> <span class='badge rounded-pill bg-info'> Se désister</span></a>";
-        }
+            case 'Terminée':
+            case 'Clôturée':
+            case 'Fermée':
+                return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>";
 
-        if ($isOpenAndSub) {
-            return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>
-                <a href=''> <span class='badge rounded-pill bg-info'>Se désister</span></a>";
-        }
-        if ($isOpenAndNotSub) {
-            return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>
-                <a href=''> <span class='badge rounded-pill bg-info'>S'inscrire</span></a>";
-        }
-        if ($isCreatedAndOrganisator) {
-            return "<a href=''> <span class='badge rounded-pill bg-info'>Modifier</span></a>
-                <a href=''> <span class='badge rounded-pill bg-info'>Publier</span></a>";
-        }
+            case 'En Cours':
+                return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>";
 
-        if ($isOpenAndOrganisator) {
-            return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>
-                <a href=''> <span class='badge rounded-pill bg-info'>Annuler</span></a>";
+            case 'En Création':
+                if ($isOrganisator) {
+                    return "<a href=''> <span class='badge rounded-pill bg-info'>Modifier</span></a>
+                            <a href=''> <span class='badge rounded-pill bg-info'>Publier</span></a>";
+                }else {
+                    return "Aucune action disponible";
+                }
+
+            case 'Annulée':
+                return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>";
+
+            default:
+                return "Aucune action disponible"; // Par défaut
         }
-        return "toto";  // Cela se produit si aucune condition n'est satisfaite
     }
 }
