@@ -1,20 +1,85 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}{{ parent() }}-Accueil{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <div class="container-fluid row mt-1">
+        <h2 class="ms-5">Filtrer les sorties</h2>
+        <div class="d-flex flex-row justify-content-lg-evenly">
+            <div class="d-flex flex-column">
+                <div class="d-flex flex-row mt-3">
+                    <label for="name-site" class="me-2 form-label">Site: </label>
+                    <select class="form-select" name="name-site" id="name-site">
+                        <option value="" selected disabled>--Choississez un site</option>
+                        {% for site in sites %}
+                        <option value="{{ site.getId()}}">{{ site.getSitName() }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="d-flex flex-row mt-3">
+                    <label for="search-name-site" class="form-label me-2"> Le nom de la sortie contient </label>
+                    <input class="form-control" type="text" name="search-name-site" id="search-name-site">
+                </div>
+                <div class="d-flex flex-row mt-3">
+                    <label for="start-date" class="form-label me-2"> Entre</label>
+                    <input class="form-control me-2" type="date" name="start-date" id="start-date">
+                    <label for="end-date" class="form-label me-2"> et </label>
+                    <input class="form-control" type="date" name="end-date" id="end-date">
+                </div>
+            </div>
+            <div class="d-flex flex-column ">
+                <div class="d-flex flex-row mt-3">
+                    <input class="form-check-input me-2" type="checkbox" value="yes" id="organisator-trip" name="organisator-trip">
+                    <label class="form-check-label" for="organisator-trip">Sortie dont je suis l'organisateur/trice</label>
+                </div>
+                <div class="d-flex flex-row mt-3">
+                    <input class="form-check-input me-2" type="checkbox" value="yes" id="subcribed-trip" name="subcribed-trip">
+                    <label class="form-check-label" for="subcribed-trip">Sortie auxquelles je suis inscrit/e</label>
+                </div>
+                <div class="d-flex flex-row mt-3">
+                    <input class="form-check-input me-2" type="checkbox" value="yes" id="not-subscribed-trip" name="not-subscribed-trip">
+                    <label class="form-check-label" for="not-subscribed-trip">Sortie auxquelles je ne suis pas inscrit/e</label>
+                </div>
+                <div class="d-flex flex-row mt-3">
+                    <input class="form-check-input me-2" type="checkbox" value="yes" id="ancient-trip" name="ancient-trip">
+                    <label class="form-check-label" for="ancient-trip">Sorties passées</label>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center align-items-center">
+                <button class="p-4 btn btn-outline-primary" type="button" id="search-trip" name="search-trip"> Rechercher</button>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid row mt-4">
+        <table class="table table-hover" name="trip-list" id="trip-list">
+            <thead class="border border-primary">
+                <th scope="col">Nom de la sortie</th>
+                <th scope="col">Date de la sortie</th>
+                <th scope="col">Clôture</th>
+                <th scope="col">inscrits/place</th>
+                <th scope="col">Etat</th>
+                <th scope="col">Inscrit</th>
+                <th scope="col">Organisateur</th>
+                <th scope="col"> Actions</th>
+            </thead>
+            <tbody>
+                {% for trip in trips %}
+                    <tr class="table-info" data-trip-id="{{ trip.getId() }}">
+                        <td> {{ trip.getTriName() }}</td>
+                        <td>{{ trip.getTriStartingDate()|date("m/d/Y") }}</td>
+                        <td> {{ trip.getTriClosingDate|date("m/d/Y") }}</td>
+                        <td>{{ trip.getTriMaxInscriptionNumber() }}</td>
+                        <td>{{ trip.getTriState().getStaLabel()}}</td>
+                        <td> a travailler</td>
+                        <td>{{ trip.getTriOrganiser().getParFirstName() }} {{ trip.getTriOrganiser().getParLastName() }}</td>
+                        <td></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+{% block javascripts %}
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/wamp64/www/Project_Sorties/src/Controller/HomeController.php</code></li>
-        <li>Your template at <code>C:/wamp64/www/Project_Sorties/templates/home/index.html.twig</code></li>
-    </ul>
-</div>
 {% endblock %}
