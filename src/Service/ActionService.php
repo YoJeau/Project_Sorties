@@ -23,13 +23,19 @@ class ActionService
             $isOpenAndNotSub = $this-> isOpenAndNotSub($isSubcribed,$checkSubcribe,$row);
             $isCreatedAndOrganisator = $this->isCreatedAndOrganisator($isOrganisator,$row);
             $isOpenAndOrganisator = $this->isOpenAndOrganisator($isOrganisator,$row);
-
-            $actions = [
-                "tripId"=>$row->getId(),
-                "action" => $this->chooseAction($isClosed,$isClosedSubDate,$isOpenAndSub,$isOpenAndNotSub,$isCreatedAndOrganisator,$isOpenAndOrganisator)
-            ] ;
+            $actions[] = [
+                "tripId" => $row->getId(),
+                "action" => $this->chooseAction(
+                    $isClosed,
+                    $isClosedSubDate,
+                    $isOpenAndSub,
+                    $isOpenAndNotSub,
+                    $isCreatedAndOrganisator,
+                    $isOpenAndOrganisator
+                )
+            ];
         }
-        var_dump($actions);
+        dd($actions);
         return $actions;
     }
 
@@ -66,7 +72,7 @@ class ActionService
 
     public function isClosedSubDate($isClosed,$isSubcribe,$row){
         $currentDate = new \DateTime();
-        if($isClosed && $isSubcribe && $currentDate > $row->getTriClosingDate()) return true;
+        if($isClosed && $isSubcribe && $currentDate < $row->getTriClosingDate()) return true;
         return false;
     }
 
@@ -90,32 +96,37 @@ class ActionService
         return false;
     }
 
-    public function chooseAction($isClosed,$isClosedSubDate,$isOpenAndSub,$isOpenAndNotSub,$isCreatedAndOrganisator,$isOpenAndOrganisator){
-        if($isClosedSubDate){
-            return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>
-                        <a href=''> <span class='badge rounded-pill bg-info'> Se désister</span></a>";
-        }
-        if($isClosed){
-            return " <a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>";
+    public function chooseAction($isClosed, $isClosedSubDate, $isOpenAndSub, $isOpenAndNotSub, $isCreatedAndOrganisator, $isOpenAndOrganisator)
+    {
+        // Débogage : affichage des valeurs des états
+//        dump(compact('isClosed', 'isClosedSubDate', 'isOpenAndSub', 'isOpenAndNotSub', 'isCreatedAndOrganisator', 'isOpenAndOrganisator'));
+
+        if ($isClosed) {
+            return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>";
         }
 
-        if($isOpenAndSub){
+        if ($isClosedSubDate) {
             return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>
-                        <a href=''> <span class='badge rounded-pill bg-info'>Se désister</span></a>";
+                <a href=''> <span class='badge rounded-pill bg-info'> Se désister</span></a>";
         }
-        if($isOpenAndNotSub){
+
+        if ($isOpenAndSub) {
             return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>
-                        <a href=''> <span class='badge rounded-pill bg-info'>S'inscrire</span></a>";
+                <a href=''> <span class='badge rounded-pill bg-info'>Se désister</span></a>";
         }
-        if($isCreatedAndOrganisator){
+        if ($isOpenAndNotSub) {
+            return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>
+                <a href=''> <span class='badge rounded-pill bg-info'>S'inscrire</span></a>";
+        }
+        if ($isCreatedAndOrganisator) {
             return "<a href=''> <span class='badge rounded-pill bg-info'>Modifier</span></a>
-                        <a href=''> <span class='badge rounded-pill bg-info'>Publier</span></a>";
+                <a href=''> <span class='badge rounded-pill bg-info'>Publier</span></a>";
         }
 
-        if($isOpenAndOrganisator){
+        if ($isOpenAndOrganisator) {
             return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>
-                        <a href=''> <span class='badge rounded-pill bg-info'>Annuler</span></a>";
+                <a href=''> <span class='badge rounded-pill bg-info'>Annuler</span></a>";
         }
-        return "toto";
+        return "toto";  // Cela se produit si aucune condition n'est satisfaite
     }
 }

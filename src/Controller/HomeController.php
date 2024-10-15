@@ -27,7 +27,7 @@ class HomeController extends AbstractController
         if(!$this->getUser()) return $this->redirectToRoute('app_login');
         $sites = $this->siteRepository->findAll();
         $trips = $this->tripRepository->findAll();
-        $this->actionService->determineAction($this->getUser(), $trips);
+        $actions = $this->actionService->determineAction($this->getUser(), $trips);
         return $this->render('home/index.html.twig', [
             'sites' => $sites,
             'trips' => $trips,
