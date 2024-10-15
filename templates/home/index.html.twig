@@ -3,7 +3,7 @@
 {% block title %}{{ parent() }}-Accueil{% endblock %}
 
 {% block body %}
-    <div class="container-fluid row mt-1">
+    <div class="container-fluid row mt-4">
         <h2 class="ms-5">Filtrer les sorties</h2>
         <div class="d-flex flex-row justify-content-lg-evenly">
             <div class="d-flex flex-column">
@@ -50,7 +50,7 @@
             </div>
         </div>
     </div>
-    <div class="container-fluid d-flex justify-content-center">
+    <div class="container-fluid d-flex justify-content-center mt-4">
         <table class="table table-hover" name="trip-list" id="trip-list">
             <thead class="border border-primary">
                 <th scope="col">Nom de la sortie</th>
@@ -64,16 +64,60 @@
             </thead>
             <tbody>
             {% if trips|length != 0 %}
+                {%  set classColor = {
+                    'Passée' : "table-dark",
+                    'Ouverte' : "table-light",
+                    'Créée' : "table-primary",
+                    'Clôturée' : "table-warning",
+                    'Annulée' : "table-danger",
+                    'Activité en cours':'table-success'
+                }
+            %}
                 {% for trip in trips %}
-                    <tr class="table-info" data-trip-id="{{ trip.getId() }}">
+                    <tr class="{{ classColor[trip.getTriState().getStaLabel()] }}" data-trip-id="{{ trip.getId() }}">
                         <td> {{ trip.getTriName() }}</td>
                         <td>{{ trip.getTriStartingDate()|date("m/d/Y") }}</td>
                         <td>{{ trip.getTriClosingDate|date("m/d/Y") }}</td>
-                        <td>{{ trip.getTriSubscribes()| length}}/git a{{ trip.getTriMaxInscriptionNumber() }}</td>
+                        <td>{{ trip.getTriSubscribes()| length}}/{{ trip.getTriMaxInscriptionNumber() }}</td>
                         <td>{{ trip.getTriState().getStaLabel()}}</td>
-                        <td> a travailler</td>
+                        <td>
+                            {% set userIsSubscribed = false %}
+                            {% for subscribe in trip.getTriSubscribes() %}
+                                {% if subscribe.getSubParticipantId() == app.user %}
+                                    {% set userIsSubscribed = true %}
+                                {% endif %}
+                            {% endfor %}
+                            {% if userIsSubscribed %}
+                                <h5>
+                                    <span class="badge rounded-pill bg-info">Inscrit</span>
+                                </h5>
+                            {% endif %}
+                        </td>
                         <td>{{ trip.getTriOrganiser().getParFirstName() }} {{ trip.getTriOrganiser().getParLastName() }}</td>
-                        <td></td>
+                        <td>
+                            {% if userIsSubscribed and trip.getTriState().getStaLabel() == 'Activité en cours' %}
+                                <a href=""> <span class="badge rounded-pill bg-info">Afficher</span></a>
+                            {% endif %}
+
+                            {% if trip.getTriState().getStaLabel() == 'Créée' and app.user.getId() == trip.getTriOrganiser().getId() %}
+                                <a href=""> <span class="badge rounded-pill bg-info">Modifier</span></a>
+                                <a href=""> <span class="badge rounded-pill bg-info">Publier</span></a>
+                            {% endif %}
+
+                            {% if trip.getTriState().getStaLabel() == 'Ouverte' and userIsSubscribed == false %}
+                                <a href=""> <span class="badge rounded-pill bg-info">S'inscrire</span></a>
+                                <a href=""> <span class="badge rounded-pill bg-info">Afficher</span></a>
+                            {% endif %}
+                            {%  if trip.getTriState().getStaLabel() == 'Ouverte' and userIsSubscribed == true  %}
+                                <a href=""> <span class="badge rounded-pill bg-info">Se désinscrire</span></a>
+                                <a href=""> <span class="badge rounded-pill bg-info">Afficher</span></a>
+                            {% endif %}
+
+                            {% if trip.getTriState().getStaLabel() == 'Ouverte' and app.user.getId() == trip.getTriOrganiser().getId() %}
+                                <a href=""> <span class="badge rounded-pill bg-info">Afficher</span></a>
+                                <a href=""> <span class="badge rounded-pill bg-info">Annuler</span></a>
+                            {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
             {% else %}
