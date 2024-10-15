@@ -13,12 +13,12 @@ class StateFixtures extends Fixture
     {
         $statesData = [
             'state_en_cours' => 'En Cours',
-            'state_ferme' => 'Fermé',
-            'state_ouvert' => 'Ouvert',
+            'state_ferme' => 'Fermée',
+            'state_ouvert' => 'Ouverte',
             'state_en_creation' => 'En Création',
-            'state_annule' => 'Annulé',
-            'state_termine' => 'Terminé',
-            'state_cloture' => 'Clôturé',
+            'state_annule' => 'Annulée',
+            'state_termine' => 'Terminée',
+            'state_cloture' => 'Clôturée',
         ];
 
         foreach ($statesData as $reference => $name) {

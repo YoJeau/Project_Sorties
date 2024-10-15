@@ -57,7 +57,7 @@ class ParticipantFixtures extends Fixture implements DependentFixtureInterface
             $participant->setParPhone($data['phone']);
             $participant->setParEmail($data['email']);
             $participant->setParIsActive($data['isActive']);
-
+            $participant->setRoles(["ROLE_USER"]);
 
             // Hasher le mot de passe
             $hashedPassword = $this->passwordHasher->hashPassword(
