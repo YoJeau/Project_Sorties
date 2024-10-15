@@ -50,31 +50,37 @@
             </div>
         </div>
     </div>
-    <div class="container-fluid row mt-4">
+    <div class="container-fluid d-flex justify-content-center">
         <table class="table table-hover" name="trip-list" id="trip-list">
             <thead class="border border-primary">
                 <th scope="col">Nom de la sortie</th>
                 <th scope="col">Date de la sortie</th>
                 <th scope="col">Clôture</th>
-                <th scope="col">inscrits/place</th>
+                <th scope="col">Inscrits/place</th>
                 <th scope="col">Etat</th>
                 <th scope="col">Inscrit</th>
                 <th scope="col">Organisateur</th>
                 <th scope="col"> Actions</th>
             </thead>
             <tbody>
+            {% if trips|length != 0 %}
                 {% for trip in trips %}
                     <tr class="table-info" data-trip-id="{{ trip.getId() }}">
                         <td> {{ trip.getTriName() }}</td>
                         <td>{{ trip.getTriStartingDate()|date("m/d/Y") }}</td>
-                        <td> {{ trip.getTriClosingDate|date("m/d/Y") }}</td>
-                        <td>{{ trip.getTriMaxInscriptionNumber() }}</td>
+                        <td>{{ trip.getTriClosingDate|date("m/d/Y") }}</td>
+                        <td>{{ trip.getTriSubscribes()| length}}/git a{{ trip.getTriMaxInscriptionNumber() }}</td>
                         <td>{{ trip.getTriState().getStaLabel()}}</td>
                         <td> a travailler</td>
                         <td>{{ trip.getTriOrganiser().getParFirstName() }} {{ trip.getTriOrganiser().getParLastName() }}</td>
                         <td></td>
                     </tr>
                 {% endfor %}
+            {% else %}
+                <tr class="table-warning">
+                    <td colspan="8" class="text-center">Aucune sortie de disponible</td>
+                </tr>
+            {% endif %}
             </tbody>
         </table>
     </div>
