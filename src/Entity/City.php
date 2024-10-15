@@ -1,93 +1,93 @@
 <?php
 
-namespace App\Entity;
+    namespace App\Entity;
 
-use App\Repository\CityRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
+    use App\Repository\CityRepository;
+    use Doctrine\Common\Collections\ArrayCollection;
+    use Doctrine\Common\Collections\Collection;
+    use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: CityRepository::class)]
-class City
-{
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $citId = null;
-
-    #[ORM\Column(length: 30)]
-    private ?string $citName = null;
-
-    #[ORM\Column(length: 5)]
-    private ?string $citPostCode = null;
-
-    /**
-     * @var Collection<int, Location>
-     */
-    #[ORM\OneToMany(targetEntity: Location::class, mappedBy: 'locCity')]
-    private Collection $citLocations;
-
-    public function __construct()
+    #[ORM\Entity(repositoryClass: CityRepository::class)]
+    class City
     {
-        $this->citLocations = new ArrayCollection();
-    }
+        #[ORM\Id]
+        #[ORM\GeneratedValue]
+        #[ORM\Column]
+        private ?int $citId = null;
 
-    public function getId(): ?int
-    {
-        return $this->citId;
-    }
+        #[ORM\Column(length: 30)]
+        private ?string $citName = null;
 
-    public function getCitName(): ?string
-    {
-        return $this->citName;
-    }
+        #[ORM\Column(length: 5)]
+        private ?string $citPostCode = null;
 
-    public function setCitName(string $citName): static
-    {
-        $this->citName = $citName;
+        /**
+         * @var Collection<int, Location>
+         */
+        #[ORM\OneToMany(targetEntity: Location::class, mappedBy: 'locCity')]
+        private Collection $citLocations;
 
-        return $this;
-    }
-
-    public function getCitPostCode(): ?string
-    {
-        return $this->citPostCode;
-    }
-
-    public function setCitPostCode(string $citPostCode): static
-    {
-        $this->citPostCode = $citPostCode;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Location>
-     */
-    public function getCitLocations(): Collection
-    {
-        return $this->citLocations;
-    }
-
-    public function addLocation(Location $location): static
-    {
-        if (!$this->citLocations->contains($location)) {
-            $this->citLocations->add($location);
-            $location->setLocCity($this);
+        public function __construct()
+        {
+            $this->citLocations = new ArrayCollection();
         }
 
-        return $this;
-    }
+        public function getId(): ?int
+        {
+            return $this->citId;
+        }
 
-    public function removeLocation(Location $location): static
-    {
-        if ($this->citLocations->removeElement($location)) {
-            // set the owning side to null (unless already changed)
-            if ($location->getLocCity() === $this) {
-                $location->setLocCity(null);
+        public function getCitName(): ?string
+        {
+            return $this->citName;
+        }
+
+        public function setCitName(string $citName): static
+        {
+            $this->citName = $citName;
+
+            return $this;
+        }
+
+        public function getCitPostCode(): ?string
+        {
+            return $this->citPostCode;
+        }
+
+        public function setCitPostCode(string $citPostCode): static
+        {
+            $this->citPostCode = $citPostCode;
+
+            return $this;
+        }
+
+        /**
+         * @return Collection<int, Location>
+         */
+        public function getCitLocations(): Collection
+        {
+            return $this->citLocations;
+        }
+
+        public function addLocation(Location $location): static
+        {
+            if (!$this->citLocations->contains($location)) {
+                $this->citLocations->add($location);
+                $location->setLocCity($this);
             }
+
+            return $this;
         }
 
-        return $this;
+        public function removeLocation(Location $location): static
+        {
+            if ($this->citLocations->removeElement($location)) {
+                // set the owning side to null (unless already changed)
+                if ($location->getLocCity() === $this) {
+                    $location->setLocCity(null);
+                }
+            }
+
+            return $this;
+        }
     }
-}
