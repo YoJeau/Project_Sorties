@@ -33,9 +33,7 @@ class HomeController extends AbstractController
 
         $sites = $this->siteRepository->findAll();
         $filters = [];
-        // Vérifiez si la requête est POST pour filtrer les voyages
         if ($request->isMethod('POST')) {
-            // Récupération des filtres
             $filters = [
                 'site' => $request->request->get('name-site'),
                 'searchName' => $request->request->get('search-name-site'),
@@ -46,20 +44,15 @@ class HomeController extends AbstractController
                 'notSubcribeTrip' => $request->request->get('not-subscribed-trip') === 'yes',
                 'ancientTrip' => $request->request->get('ancient-trip') === 'yes',
             ];
+            $user = $this->getUser();
 
-            $user = $this->getUser(); // Récupérer l'utilisateur actuel
-
-            // Appliquer les filtres
             $filteredTrips = $filterService->filterTrips($filters, $user);
 
-            // Pagination des résultats filtrés
             $trips = $paginator->paginate($filteredTrips, $request->query->getInt('page', 1), 5);
         } else {
-            // Récupérer tous les voyages si la requête n'est pas de type POST
             $trips = $paginator->paginate($this->tripRepository->findAll(), $request->query->getInt('page', 1), 5);
         }
 
-        // Déterminer les actions pour les voyages
         $actions = $this->actionService->determineAction($this->getUser(), $trips);
 
         return $this->render('home/index.html.twig', [
