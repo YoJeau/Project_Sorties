@@ -6,11 +6,14 @@ use App\Entity\Site;
 use App\Repository\SiteRepository;
 use App\Repository\TripRepository;
 use App\Service\ActionService;
+use App\Service\FilterService;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class HomeController extends AbstractController
 {
@@ -23,17 +26,47 @@ class HomeController extends AbstractController
         $this->tripRepository = $tripRepository;
         $this->actionService = $actionService;
     }
-    #[Route('/', name: 'app_home')]
-    public function index(Request $request,PaginatorInterface $paginator ): Response
+    #[Route('/', name: 'app_home', methods: ['GET', 'POST'])]
+    public function index(Request $request, PaginatorInterface $paginator, FilterService $filterService): Response
     {
-        if(!$this->getUser()) return $this->redirectToRoute('app_login');
+        if (!$this->getUser()) return $this->redirectToRoute('app_login');
+
         $sites = $this->siteRepository->findAll();
-        $trips = $paginator->paginate($this->tripRepository->findAll(),$request->query->getInt('page',1),5);
+        $filters = [];
+        // Vérifiez si la requête est POST pour filtrer les voyages
+        if ($request->isMethod('POST')) {
+            // Récupération des filtres
+            $filters = [
+                'site' => $request->request->get('name-site'),
+                'searchName' => $request->request->get('search-name-site'),
+                'startDate' => $request->request->get('start-date'),
+                'endDate' => $request->request->get('end-date'),
+                'organisatorTrip' => $request->request->get('organisator-trip') === 'yes',
+                'subcribeTrip' => $request->request->get('subcribed-trip') === 'yes',
+                'notSubcribeTrip' => $request->request->get('not-subscribed-trip') === 'yes',
+                'ancientTrip' => $request->request->get('ancient-trip') === 'yes',
+            ];
+
+            $user = $this->getUser(); // Récupérer l'utilisateur actuel
+
+            // Appliquer les filtres
+            $filteredTrips = $filterService->filterTrips($filters, $user);
+
+            // Pagination des résultats filtrés
+            $trips = $paginator->paginate($filteredTrips, $request->query->getInt('page', 1), 5);
+        } else {
+            // Récupérer tous les voyages si la requête n'est pas de type POST
+            $trips = $paginator->paginate($this->tripRepository->findAll(), $request->query->getInt('page', 1), 5);
+        }
+
+        // Déterminer les actions pour les voyages
         $actions = $this->actionService->determineAction($this->getUser(), $trips);
+
         return $this->render('home/index.html.twig', [
             'sites' => $sites,
             'trips' => $trips,
             'actions' => $actions,
+            'filters' => $filters,
         ]);
     }
 }

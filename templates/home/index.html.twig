@@ -3,54 +3,11 @@
 {% block title %}{{ parent() }}-Accueil{% endblock %}
 
 {% block body %}
-    <div class="row">
-        <h2 class="ms-5">Filtrer les sorties</h2>
-        <div class="d-flex flex-row justify-content-lg-evenly">
-            <div class="d-flex flex-column">
-                <div class="d-flex flex-row mt-3">
-                    <label for="name-site" class="me-2 form-label">Site: </label>
-                    <select class="form-select" name="name-site" id="name-site">
-                        <option value="" selected disabled>--Choississez un site</option>
-                        {% for site in sites %}
-                            <option value="{{ site.getId()}}">{{ site.getSitName() }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="d-flex flex-row mt-3">
-                    <label for="search-name-site" class="form-label me-2"> Le nom de la sortie contient </label>
-                    <input class="form-control" type="text" name="search-name-site" id="search-name-site">
-                </div>
-                <div class="d-flex flex-row mt-3">
-                    <label for="start-date" class="form-label me-2"> Entre</label>
-                    <input class="form-control me-2" type="date" name="start-date" id="start-date">
-                    <label for="end-date" class="form-label me-2"> et </label>
-                    <input class="form-control" type="date" name="end-date" id="end-date">
-                </div>
-            </div>
-            <div class="d-flex flex-column ">
-                <div class="d-flex flex-row mt-3">
-                    <input class="form-check-input me-2" type="checkbox" value="yes" id="organisator-trip" name="organisator-trip">
-                    <label class="form-check-label" for="organisator-trip">Sortie dont je suis l'organisateur/trice</label>
-                </div>
-                <div class="d-flex flex-row mt-3">
-                    <input class="form-check-input me-2" type="checkbox" value="yes" id="subcribed-trip" name="subcribed-trip">
-                    <label class="form-check-label" for="subcribed-trip">Sortie auxquelles je suis inscrit/e</label>
-                </div>
-                <div class="d-flex flex-row mt-3">
-                    <input class="form-check-input me-2" type="checkbox" value="yes" id="not-subscribed-trip" name="not-subscribed-trip">
-                    <label class="form-check-label" for="not-subscribed-trip">Sortie auxquelles je ne suis pas inscrit/e</label>
-                </div>
-                <div class="d-flex flex-row mt-3">
-                    <input class="form-check-input me-2" type="checkbox" value="yes" id="ancient-trip" name="ancient-trip">
-                    <label class="form-check-label" for="ancient-trip">Sorties passées</label>
-                </div>
-            </div>
-            <div class="d-flex justify-content-center align-items-center">
-                <button class="p-4 btn btn-outline-primary" type="button" id="search-trip" name="search-trip"> Rechercher</button>
-            </div>
-        </div>
+    <div class="container mt-4">
+        <h2 class="mb-4">Filtrer les sorties</h2>
+        {%  include 'home/_filter.twig.html' %}
     </div>
-    <div class="mt-4">
+    <div class="mt-5">
         {% include 'home/_trip_list.twig.html' %}
     </div>
     <div class="d-flex justify-content-center">
@@ -61,5 +18,5 @@
 {% endblock %}
 
 {% block javascripts %}
-
+    <script src="{{ asset('js/filter.js') }}"></script>
 {% endblock %}
