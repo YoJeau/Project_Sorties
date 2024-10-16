@@ -1,0 +1,13 @@
+<div class="row" id="msg">
+    <div class="col-6 offset-3">
+        {% for type, messages in app.flashes %}
+            <div class="alert alert-{{ type }}">
+                <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+</div>
