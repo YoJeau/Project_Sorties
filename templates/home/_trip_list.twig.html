@@ -24,8 +24,8 @@
             {% for trip in trips %}
             <tr class="table-dark" data-trip-id="{{ trip.getId() }}">
                 <td>{{ trip.getTriName() }}</td>
-                <td>{{ trip.getTriStartingDate()|date("m/d/Y") }}</td>
-                <td>{{ trip.getTriClosingDate()|date("m/d/Y") }}</td>
+                <td>{{ trip.getTriStartingDate()|date("d/m/Y") }}</td>
+                <td>{{ trip.getTriClosingDate()|date("d/m/Y") }}</td>
                 <td>{{ trip.getTriSubscribes()|length }}/{{ trip.getTriMaxInscriptionNumber() }}</td>
                 <td class="{{ classColor[trip.getTriState().getStaLabel()] }}">{{ trip.getTriState().getStaLabel() }}</td>
                 <td>

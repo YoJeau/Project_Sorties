@@ -30,9 +30,7 @@ class TripRepository extends ServiceEntityRepository
         $this->applySiteFilter($qb, $filters);
         $this->applyNameFilter($qb, $filters);
         $this->applyDateFilters($qb, $filters);
-        $this->applyOrganisatorFilter($qb, $filters);
-        $this->applySubscriptionFilters($qb, $filters, $user);
-        $this->applyAncientTripFilter($qb, $filters);
+        $this->applyOrganisatorAndSubscriptionAndAncientFilters($qb, $filters, $user);
 
         return $qb->getQuery()->getResult();
     }
@@ -66,37 +64,59 @@ class TripRepository extends ServiceEntityRepository
         }
     }
 
-    private function applyOrganisatorFilter($qb, $filters)
+    private function applyOrganisatorAndSubscriptionAndAncientFilters($qb, $filters, $user)
     {
+        // Initialisation des conditions et des paramètres
+        $conditions = [];
+        $params = [];
+
+        // Conditions basées sur le filtre "organisator"
         if ($filters['organisatorTrip'] !== false) {
-            $qb->andWhere('o.parId = :organisatorTrip')
-                ->setParameter('organisatorTrip', $filters['organisatorTrip']); // Assurez-vous d'utiliser la valeur correcte ici
+            $conditions[] = 'o.parId = :userId';
+            $params['userId'] = $user->getId();  // Ajoute userId pour l'organisateur
         }
-    }
 
-    private function applySubscriptionFilters($qb, $filters, $user)
-    {
-        if ($filters['subcribeTrip'] !== false && $filters['notSubcribeTrip'] !== false) {
-            // Si les deux filtres sont sélectionnés, ne rien filtrer ou définir une condition par défaut
+        // Vérification des filtres d'inscription
+        $isSubcribed = $filters['subcribeTrip'] !== false;
+        $isNotSubcribed = $filters['notSubcribeTrip'] !== false;
+
+        // Si les deux filtres d'inscription sont activés, ne rien filtrer
+        if ($isSubcribed && $isNotSubcribed) {
             $qb->andWhere('1 = 1'); // Cela ne filtre rien
-        } elseif ($filters['subcribeTrip'] !== false) {
-            // Vérifier si l'utilisateur est inscrit
-            $qb->andWhere('sub.subParticipantId = :userId')
-                ->setParameter('userId', $user->getId());
-        } elseif ($filters['notSubcribeTrip'] !== false) {
-            // Vérifier si l'utilisateur n'est pas inscrit
-            $qb->andWhere('sub.subParticipantId IS NULL OR sub.subParticipantId != :userId')
-                ->setParameter('userId', $user->getId());
+        } elseif ($isSubcribed) {
+            // Condition pour "inscrit"
+            $conditions[] = 'sub.subParticipantId = :userId';
+            $params['userId'] = $user->getId();
+        } elseif ($isNotSubcribed) {
+            // Condition pour "non inscrit"
+            $conditions[] = '(sub.subParticipantId IS NULL OR sub.subParticipantId != :userId)';
+            $params['userId'] = $user->getId(); // Assure que le paramètre userId est lié
+        }
+
+        // Si le filtre des "Sorties passées" est activé
+        if ($filters['ancientTrip'] !== false) {
+            $conditions[] = 't.triStartingDate < :now';
+            $params['now'] = new \DateTime();
+        }
+
+        // Construire la requête en s'assurant de l'absence de conflits
+        if (!empty($conditions)) {
+            // Utiliser "AND" pour lier toutes les conditions
+            $qb->andWhere(implode(' AND ', $conditions));
+
+            // Appliquer les paramètres
+            foreach ($params as $key => $value) {
+                $qb->setParameter($key, $value);
+            }
         }
     }
 
-    private function applyAncientTripFilter($qb, $filters)
-    {
-        if ($filters['ancientTrip'] !== false) {
-            $qb->andWhere('t.triClosingDate < :now')
-                ->setParameter('now', new \DateTime());
-        }
-    }
+
+
+
+
+
+
 
 
     //    /**
