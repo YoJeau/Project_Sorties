@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container-fluid">
+    <h1 class="text-center mt-3">Créer une sortie</h1>
+
+        {{ form_start(tripForm) }}
+        <div class="d-flex flex-row">
+            <div class="w-50 m-5">
+                {{ form_label(tripForm.triName) }}
+                {{ form_widget(tripForm.triName) }}
+
+                {{ form_label(tripForm.triStartingDate) }}
+                {{ form_widget(tripForm.triStartingDate) }}
+
+
+                {{ form_label(tripForm.triClosingDate) }}
+                {{ form_widget(tripForm.triClosingDate) }}
+
+                {{ form_label(tripForm.triMaxInscriptionNumber) }}
+                {{ form_widget(tripForm.triMaxInscriptionNumber) }}
+
+
+                {{ form_label(tripForm.triDuration) }}
+                {{ form_widget(tripForm.triDuration) }}
+
+                {{ form_label(tripForm.triDescription) }}
+                {{ form_widget(tripForm.triDescription) }}
+
+                <div class="togglePublier form-check form-switch d-flex justify-content-center mt-3 gap-3">
+                    <input id="inputPublier" class="form-check-input" type="checkbox" checked>
+                    <label class="form-check-label align-content-center" for="flexSwitchCheckChecked">Publier la sortie</label>
+                </div>
+
+            </div>
+            <div class="w-50 m-5">
+                {{ form_label(tripForm.triSite) }}
+                {{ form_widget(tripForm.triSite) }}
+
+                {{ form_label(locationForm.locCity) }}
+                {{ form_widget(locationForm.locCity) }}
+
+                <div>
+                    {{ form_label(tripForm.triLocation) }}
+                    <div class="d-flex flex-row gap-3">
+                        {{ form_widget(tripForm.triLocation) }}
+                        <div class="d-flex align-items-center">
+                            <i id="addLocation" class="fa-solid fa-circle-plus"></i>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div id="viewLocation" class="visually-hidden">
+                    {{ form_label(locationForm.locStreet) }}
+                    {{ form_widget(locationForm.locStreet) }}
+
+
+
+                    <div class="d-flex flex-row justify-content-between">
+                        <div>
+                            {{ form_label(cityForm.citPostCode) }}
+                            {{ form_widget(cityForm.citPostCode) }}
+                        </div>
+
+                        <div>
+                            {{ form_label(cityForm.citName) }}
+                            {{ form_widget(cityForm.citName) }}
+                        </div>
+
+                    </div>
+
+                    {{ form_label(locationForm.locLatitude) }}
+                    {{ form_widget(locationForm.locLatitude) }}
+
+                    {{ form_label(locationForm.locLongitude) }}
+                    {{ form_widget(locationForm.locLongitude) }}
+                </div>
+
+
+            </div>
+        </div>
+
+
+        <div class="d-flex flex-row justify-content-center m-3 gap-3">
+            <button type="submit" class="btn btn-success">Enregistrer</button>
+            <button type="submit" class="btn btn-danger">Annuler</button>
+        </div>
+
+        {{ form_end(tripForm) }}
+
+
+</div>
+{% endblock %}
