@@ -11,44 +11,48 @@
             <img src="{{ asset('img/' ~ (participant.parPicture ?: 'default.png')) }}" alt="{{ asset('img') }}" width="200">
         </div>
         <div class="d-flex flex-row justify-content-center w-75">
-            <div class="d-flex flex-column">
-                <div>
-                    Prénom :
-                </div>
-                <div>
-                    Nom :
-                </div>
-                <div>
-                    Téléphone :
-                </div>
-                <div>
-                    Email :
-                </div>
-                <div>
-                    Ville de rattachement :
+            <div class="d-flex justify-content-end w-25 px-3">
+                <div class="d-flex flex-column row-gap-3">
+                    <div>
+                        Prénom :
+                    </div>
+                    <div>
+                        Nom :
+                    </div>
+                    <div>
+                        Téléphone :
+                    </div>
+                    <div>
+                        Email :
+                    </div>
+                    <div>
+                        Ville de rattachement :
+                    </div>
                 </div>
             </div>
-            <div class="d-flex flex-column">
-                <div>
-                    {{ participant.parFirstName }}
-                </div>
-                <div>
-                    {{ participant.parLastName }}
-                </div>
-                <div>
-                    {{ participant.parPhone }}
-                </div>
-                <div>
-                    {{ participant.parEmail }}
-                </div>
-                <div>
-                    {{ participant.parSite.sitName }}
+            <div class="d-flex w-50 px-3">
+                <div class="d-flex flex-column row-gap-3">
+                    <div>
+                        {{ participant.parFirstName }}
+                    </div>
+                    <div>
+                        {{ participant.parLastName }}
+                    </div>
+                    <div>
+                        {{ participant.parPhone }}
+                    </div>
+                    <div>
+                        {{ participant.parEmail }}
+                    </div>
+                    <div>
+                        {{ participant.parSite.sitName }}
+                    </div>
                 </div>
             </div>
 
         </div>
     </div>
     <div class="d-flex justify-content-center p-3">
-        <button type="button">Retour</button>
+        <button type="button" onClick="window.history.back();" class="btn btn-primary btn-lg">Retour</button>
     </div>
 {% endblock %}
