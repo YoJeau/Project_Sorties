@@ -31,7 +31,7 @@ class LocationType extends AbstractType
             ->add('locCity', EntityType::class, [
                 'label' => "Ville",
                 'class' => City::class,
-                'choice_label' => 'id',
+                'choice_label' => 'citName',
             ])
         ;
     }
