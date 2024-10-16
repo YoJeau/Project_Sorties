@@ -52,18 +52,18 @@ class TripType extends AbstractType
                 'label' => "Site",
                 'label_attr' => ['class' => 'w-50'],
                 'class' => Site::class,
-                'choice_label' => 'id',
+                'choice_label' => 'sitName',
             ])
             ->add('triLocation', EntityType::class, [
                 'label' => "Lieu",
                 'label_attr' => ['class' => 'w-50'],
                 'class' => Location::class,
-                'choice_label' => 'id',
+                'choice_label' => 'locName',
             ])
 //            ->add('triCancellationReason')
 //            ->add('triState', EntityType::class, [
 //                'class' => State::class,
-//                'choice_label' => 'id',
+//                'choice_label' => 'staLabel',
 //            ])
 
 //            ->add('triOrganiser', EntityType::class, [
