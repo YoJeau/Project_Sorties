@@ -23,6 +23,7 @@ class ParticipantController extends AbstractController
      *
      * @param Request $request
      * @param EntityManagerInterface $entityManager
+     * @param UserPasswordHasherInterface $passwordHasher
      * @param Participant|null $participant
      * @return Response
      */
@@ -118,6 +119,12 @@ class ParticipantController extends AbstractController
         ]);
     }
 
+    /**
+     * Affiche le profil d'un participant.
+     *
+     * @param Participant $participant
+     * @return Response
+     */
     #[Route('/{id}', name: '_show', methods: ['GET'])]
     public function show(Participant $participant): Response
     {
