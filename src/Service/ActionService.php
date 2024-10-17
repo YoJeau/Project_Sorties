@@ -50,43 +50,68 @@ class ActionService
         return $this->urlGenerator->generate($nameRoute, ['id' => $param], UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
-    public function chooseAction($state, $isSubcribed, $isOrganisator,$id)
+    public function chooseAction($state, $isSubcribed, $isOrganisator, $id)
     {
+        // Générer le lien "Afficher" commun à tous les états
+        $viewLink = "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>";
+
+        // Vérifier l'état pour déterminer les actions possibles
         switch ($state) {
             case 'Ouverte':
-                if ($isSubcribed) {
-                    return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>
-                            <a href='".$this->generatePath('app_subscribe_delete', $id)."'> <span class='badge rounded-pill bg-info'>Se désister</span></a>";
-                } else if ($isOrganisator) {
-                    return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>
-                            <a href=''> <span class='badge rounded-pill bg-info'>Annuler</span></a>";
-                }
-                else {
-                    return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>
-                            <a href='".$this->generatePath('app_subscribe', $id)."'> <span class='badge rounded-pill bg-info'>S'inscrire</span></a>";
-                }
+                return $this->getOpenStateActions($isSubcribed, $isOrganisator, $id, $viewLink);
+
+            case 'Fermée':
+                return $this->getClosedStateActions($isSubcribed, $id, $viewLink);
 
             case 'Terminée':
             case 'Clôturée':
-            case 'Fermée':
-                return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>";
-
             case 'En Cours':
-                return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>";
+            case 'Annulée':
+                return $viewLink; // Lien "Afficher" uniquement
 
             case 'En Création':
-                if ($isOrganisator) {
-                    return "<a href=''> <span class='badge rounded-pill bg-info'>Modifier</span></a>
-                            <a href=''> <span class='badge rounded-pill bg-info'>Publier</span></a>";
-                }else {
-                    return "Aucune action disponible";
-                }
-
-            case 'Annulée':
-                return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>";
+                return $this->getCreationStateActions($isOrganisator, $viewLink);
 
             default:
-                return "Aucune action disponible"; // Par défaut
+                return "Aucune action disponible";
         }
+    }
+
+    private function getOpenStateActions($isSubcribed, $isOrganisator, $id, $viewLink)
+    {
+        if ($isSubcribed) {
+            // Utilisateur inscrit
+            return $viewLink .
+                "<a href='".$this->generatePath('app_subscribe_delete', $id)."'> <span class='badge rounded-pill bg-info'>Se désister</span></a>";
+        } elseif ($isOrganisator) {
+            // Organisateur de l'événement
+            return $viewLink .
+                "<a href=''> <span class='badge rounded-pill bg-info'>Annuler</span></a>";
+        } else {
+            // Pas encore inscrit
+            return $viewLink .
+                "<a href='".$this->generatePath('app_subscribe', $id)."'> <span class='badge rounded-pill bg-info'>S'inscrire</span></a>";
+        }
+    }
+
+    private function getClosedStateActions($isSubcribed, $id, $viewLink)
+    {
+        if ($isSubcribed) {
+            // Inscrit à un événement fermé
+            return $viewLink .
+                "<a href='".$this->generatePath('app_subscribe_delete', $id)."'> <span class='badge rounded-pill bg-info'>Se désister</span></a>";
+        }
+        // Seulement le lien "Afficher" si non inscrit
+        return $viewLink;
+    }
+
+    private function getCreationStateActions($isOrganisator, $viewLink)
+    {
+        if ($isOrganisator) {
+            // L'organisateur peut modifier ou publier
+            return "<a href=''> <span class='badge rounded-pill bg-info'>Modifier</span></a>".
+                "<a href=''> <span class='badge rounded-pill bg-info'>Publier</span></a>";
+        }
+        return "Aucune action disponible";
     }
 }

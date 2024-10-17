@@ -18,6 +18,7 @@ class SubscribeService
     public function checkSubscribe($trip, $user){
 
         $isPossible = true;
+        $isPossible &= $this->isOrganiser($trip, $user);
         $isPossible &= $this->alreadySubscribe($trip, $user);
         $isPossible &= $this->checkMaxSubscribe($trip);
         $isPossible &= $this->checkState($trip);
@@ -45,6 +46,7 @@ class SubscribeService
         ]);
 
         $isPossible &= $subscribe !== null;
+        $isPossible &= $this->isOrganiser($trip, $user);
         $isPossible &= $this->checkState($trip);
 
         if ($isPossible) {
@@ -67,6 +69,11 @@ class SubscribeService
         return true; // Pas déjà abonné, renvoie true
     }
 
+    private function isOrganiser($trip, $user){
+        if($trip->getTriOrganiser()->getId() === $user->getId()) return false;
+        return true;
+    }
+
     private function checkMaxSubscribe($trip){
         $maxSubscribe = $trip->getTriMaxInscriptionNumber();
         $countSubscribe = count($trip->getTriSubscribes());
@@ -76,7 +83,7 @@ class SubscribeService
 
     public function checkState($trip){
         $state = $trip->getTriState()->getStaLabel();
-        if($state !== 'Ouverte') return false;
-        return true;
+        if($state === 'Ouverte' || $state === 'Fermée') return true;
+        return false;
     }
 }
