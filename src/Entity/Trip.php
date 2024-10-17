@@ -157,7 +157,7 @@ class Trip
     /**
      * @return Collection<int, Subscribe>
      */
-        public function getTriSubscribes(): Collection
+    public function getTriSubscribes(): Collection
     {
         return $this->triSubscribes;
     }
