@@ -1,8 +1,14 @@
 <?php
 namespace App\Service;
 
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
 class ActionService
 {
+
+    public function __construct(UrlGeneratorInterface $urlGenerator){
+        $this->urlGenerator = $urlGenerator;
+    }
     /**
      * Détermine l'action à réaliser pour chaque voyage.
      *
@@ -19,7 +25,7 @@ class ActionService
 
             $actions[] = [
                 "tripId" => $row->getId(),
-                "action" => $this->chooseAction($state, $isSubcribed, $isOrganisator)
+                "action" => $this->chooseAction($state, $isSubcribed, $isOrganisator,$row->getId())
             ];
         }
         return $actions;
@@ -40,20 +46,24 @@ class ActionService
         return $row->getTriOrganiser()->getId() == $user->getId();
     }
 
-    public function chooseAction($state, $isSubcribed, $isOrganisator)
+    public function generatePath($nameRoute,$param){
+        return $this->urlGenerator->generate($nameRoute, ['id' => $param], UrlGeneratorInterface::ABSOLUTE_PATH);
+    }
+
+    public function chooseAction($state, $isSubcribed, $isOrganisator,$id)
     {
         switch ($state) {
             case 'Ouverte':
                 if ($isSubcribed) {
                     return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>
-                            <a href=''> <span class='badge rounded-pill bg-info'>Se désister</span></a>";
+                            <a href='".$this->generatePath('app_subscribe_delete', $id)."'> <span class='badge rounded-pill bg-info'>Se désister</span></a>";
                 } else if ($isOrganisator) {
                     return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>
                             <a href=''> <span class='badge rounded-pill bg-info'>Annuler</span></a>";
                 }
                 else {
                     return "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>
-                            <a href=''> <span class='badge rounded-pill bg-info'>S'inscrire</span></a>";
+                            <a href='".$this->generatePath('app_subscribe', $id)."'> <span class='badge rounded-pill bg-info'>S'inscrire</span></a>";
                 }
 
             case 'Terminée':
