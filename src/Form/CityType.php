@@ -15,6 +15,7 @@ class CityType extends AbstractType
         $builder
             ->add('citName', TextType::class, [
                 'label' => 'Ville',
+                'label_attr' => ['class' => 'w-50']
             ])
             ->add('citPostCode', TextType::class, [
                 'label' => 'Code Postal',

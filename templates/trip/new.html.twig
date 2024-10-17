@@ -27,10 +27,13 @@
                 {{ form_label(tripForm.triDescription) }}
                 {{ form_widget(tripForm.triDescription) }}
 
-                <div class="togglePublier form-check form-switch d-flex justify-content-center mt-3 gap-3">
-                    <input id="inputPublier" class="form-check-input" type="checkbox" checked>
-                    <label class="form-check-label align-content-center" for="flexSwitchCheckChecked">Publier la sortie</label>
-                </div>
+{#                <div class="togglePublier form-check form-switch d-flex justify-content-center mt-3 gap-3">#}
+{#                    <input id="inputPublier" class="form-check-input" type="checkbox" checked>#}
+{#                    <label class="form-check-label align-content-center" for="flexSwitchCheckChecked">Publier la sortie</label>#}
+{#                </div>#}
+                {{ form_label(tripForm.state) }}
+                {{ form_widget(tripForm.state) }}
+
 
             </div>
             <div class="w-50 m-5">
@@ -51,31 +54,22 @@
                     </div>
                 </div>
 
-
-                <div id="viewLocation" class="visually-hidden">
-                    {{ form_label(locationForm.locStreet) }}
-                    {{ form_widget(locationForm.locStreet) }}
-
-
+                <div id="viewLocation" hidden>
+                    {{ form_row(locationForm.locStreet, { 'required' : false }) }}
 
                     <div class="d-flex flex-row justify-content-between">
                         <div>
-                            {{ form_label(cityForm.citPostCode) }}
-                            {{ form_widget(cityForm.citPostCode) }}
+                            {{ form_row(cityForm.citPostCode, { 'required' : false }) }}
                         </div>
-
                         <div>
-                            {{ form_label(cityForm.citName) }}
-                            {{ form_widget(cityForm.citName) }}
+                            {{ form_row(cityForm.citName, { 'required' : false }) }}
                         </div>
-
                     </div>
 
-                    {{ form_label(locationForm.locLatitude) }}
-                    {{ form_widget(locationForm.locLatitude) }}
+                    {{ form_row(locationForm.locLatitude, { 'required' : false }) }}
 
-                    {{ form_label(locationForm.locLongitude) }}
-                    {{ form_widget(locationForm.locLongitude) }}
+                    {{ form_row(locationForm.locLongitude, { 'required' : false }) }}
+
                 </div>
 
 

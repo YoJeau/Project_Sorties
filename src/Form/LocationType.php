@@ -20,13 +20,16 @@ class LocationType extends AbstractType
                 'label' => 'Nom du lieu'
             ])
             ->add('locStreet', TextType::class, [
-                'label' => 'Rue'
+                'label' => 'Rue',
+                'label_attr' => ['class' => 'w-50']
             ])
             ->add('locLatitude', NumberType::class, [
                 'label' => 'Latitude',
+                'label_attr' => ['class' => 'w-50']
             ])
             ->add('locLongitude', NumberType::class, [
                 'label' => 'Longitude',
+                'label_attr' => ['class' => 'w-50']
             ])
             ->add('locCity', EntityType::class, [
                 'label' => "Ville",

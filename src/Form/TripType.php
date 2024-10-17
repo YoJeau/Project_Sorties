@@ -9,6 +9,7 @@ use App\Entity\State;
 use App\Entity\Trip;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -61,10 +62,11 @@ class TripType extends AbstractType
                 'choice_label' => 'locName',
             ])
 //            ->add('triCancellationReason')
-//            ->add('triState', EntityType::class, [
-//                'class' => State::class,
-//                'choice_label' => 'staLabel',
-//            ])
+            ->add('state', CheckboxType::class, [
+                'label' => "Publier la sortie",
+                'mapped' => false,
+                'required' => false,
+            ])
 
 //            ->add('triOrganiser', EntityType::class, [
 //                'class' => Participant::class,
