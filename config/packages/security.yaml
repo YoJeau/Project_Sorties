@@ -43,12 +43,7 @@ security:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
         - { path: ^/participant, roles: ROLE_USER }
-        - { path: ^/participant/new, roles: ROLE_ADMIN }
-        - { path: ^/participant/activate, roles: ROLE_ADMIN }
-        - { path: ^/participant/deactivate, roles: ROLE_ADMIN }
-        - { path: ^/participant/delete, roles: ROLE_ADMIN }
-        - { path: ^/site, roles: ROLE_ADMIN }
-        - { path: ^/city, roles: ROLE_ADMIN }
+        - { path: ^/trip/cancel, roles: ROLE_USER }
 
     role_hierarchy:
         ROLE_ADMIN: ROLE_USER

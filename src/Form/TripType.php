@@ -60,16 +60,19 @@ class TripType extends AbstractType
                 'class' => Location::class,
                 'choice_label' => 'locName',
             ])
-//            ->add('triCancellationReason')
-//            ->add('triState', EntityType::class, [
-//                'class' => State::class,
-//                'choice_label' => 'staLabel',
-//            ])
+            ->add('triCancellationReason', TextareaType::class, [
+                'label' => 'Motif',
+                'label_attr' => ['class' => 'w-100'],
+            ])
+            ->add('triState', EntityType::class, [
+                'class' => State::class,
+                'choice_label' => 'staLabel',
+            ])
 
-//            ->add('triOrganiser', EntityType::class, [
-//                'class' => Participant::class,
-//                'choice_label' => 'id',
-//            ])
+            ->add('triOrganiser', EntityType::class, [
+                'class' => Participant::class,
+                'choice_label' => 'id',
+            ])
 
         ;
     }
