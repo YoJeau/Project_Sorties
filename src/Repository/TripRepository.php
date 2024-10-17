@@ -55,7 +55,7 @@ class TripRepository extends ServiceEntityRepository
         }
 
         if (!empty($filters['endDate'])) {
-            $qb->andWhere('t.triClosingDate <= :endDate')
+            $qb->andWhere('t.triStartingDate <= :endDate')
                 ->setParameter('endDate', $filters['endDate']);
         }
     }
