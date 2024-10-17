@@ -28,6 +28,9 @@ class CheckStateService
             $startDate = $trip->getTriStartingDate();
             $endDate = $trip->getTriClosingDate();
             $state = $trip->getTriState()->getStaLabel();
+            $startDate = new \DateTimeImmutable($startDate->format('Y-m-d H:i:s'), $timezone);
+            $endDate = new \DateTimeImmutable($endDate->format('Y-m-d H:i:s'), $timezone);
+
 
 
             // Ignorer les trips en "En création", "Terminée" ou "Annulée"
@@ -36,9 +39,10 @@ class CheckStateService
             }
 
             // Vérifications d'état
+
+            $this->checkOpenState($trip,$startDate, $timezone);
             $this->checkInProgressState($trip, $startDate, $timezone);
             $this->checkedClosedState($trip, $startDate, $endDate, $timezone);
-//            $this->checkOpenState($trip,$startDate, $timezone);
         }
         $this->entityManager->flush();
     }
@@ -54,6 +58,7 @@ class CheckStateService
         $duration = $trip->getTriDuration(); // Durée en minutes
         $endDate = $startDate->modify("+{$duration} minutes");
 
+
         if ($currentDate >= $startDate && $currentDate <= $endDate) {
             $this->updateTripState($trip, 'En Cours');
         }
@@ -62,17 +67,8 @@ class CheckStateService
         if ($currentDate > $endDate) {
             $this->updateTripState($trip, 'Terminée');
         }
-
     }
 
-
-//    public function checkFinishedState($trip, $startDate, $timezone)
-//    {
-//        $currentDate = new \DateTimeImmutable('now', $timezone);
-//        if ($currentDate > $startDate) {
-//            $this->updateTripState($trip, 'Terminée');
-//        }
-//    }
 
     public function checkOpenState($trip, $startDate, $timezone)
     {
@@ -80,9 +76,7 @@ class CheckStateService
         $subscribes = count($trip->getTriSubscribes());
         $isFull = $maxSubcribe == $subscribes;
         $currentDate = new \DateTimeImmutable('now', $timezone);
-        $currentDateTimeStamp = $currentDate->getTimestamp();
-        $startTimeStamp = $startDate->getTimestamp();
-        if ($currentDateTimeStamp < $startTimeStamp && !$isFull) {
+        if ($currentDate < $startDate && !$isFull) {
             $this->updateTripState($trip, 'Ouverte');
         }
 

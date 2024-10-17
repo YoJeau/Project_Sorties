@@ -29,6 +29,10 @@ class HomeController extends AbstractController
         $this->actionService = $actionService;
         $this->checkStateService = $checkStateService;
     }
+
+    /**
+     * @throws \DateMalformedStringException
+     */
     #[Route('/', name: 'app_home', methods: ['GET', 'POST'])]
     public function index(Request $request, PaginatorInterface $paginator, FilterService $filterService): Response
     {
