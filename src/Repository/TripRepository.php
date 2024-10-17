@@ -2,13 +2,10 @@
 
 namespace App\Repository;
 
-use App\Entity\Trip;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\Trip;
 
-/**
- * @extends ServiceEntityRepository<Trip>
- */
 class TripRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -18,19 +15,18 @@ class TripRepository extends ServiceEntityRepository
 
     public function getFilteredTrips($filters, $user)
     {
-        $qb = $this->createQueryBuilder('t');
+        $qb = $this->createQueryBuilder('t'); // 't' est l'alias de Trip
 
-        // Jointures pour les relations (organisateur, site, inscriptions)
-        $qb->leftJoin('t.triOrganiser', 'o') // Organisateur
-        ->leftJoin('t.triSite', 's')      // Site
-        ->leftJoin('t.triSubscribes', 'sub') // Inscriptions
-        ->leftJoin('sub.subParticipantId', 'p'); // Joindre les participants inscrits
+        $this->applyOrganizerAndSubscriptionFilters($qb, $filters, $user);
 
-        // Appliquer les filtres
-        $this->applySiteFilter($qb, $filters);
+        if ($filters['ancientTrip'] === true) {
+            $qb->orWhere('t.triStartingDate < :now')
+                ->setParameter('now', new \DateTime());
+        }
+
         $this->applyNameFilter($qb, $filters);
         $this->applyDateFilters($qb, $filters);
-        $this->applyOrganisatorAndSubscriptionAndAncientFilters($qb, $filters, $user);
+        $this->applySiteFilter($qb, $filters);
 
         return $qb->getQuery()->getResult();
     }
@@ -46,8 +42,8 @@ class TripRepository extends ServiceEntityRepository
     private function applyNameFilter($qb, $filters)
     {
         if (!empty($filters['searchName'])) {
-            $qb->andWhere('LOWER(t.triName) LIKE :searchName')
-                ->setParameter('searchName', '%' . strtolower($filters['searchName']) . '%');
+            $qb->andWhere('t.triName LIKE :searchName')
+                ->setParameter('searchName', '%' . $filters['searchName'] . '%');
         }
     }
 
@@ -64,83 +60,42 @@ class TripRepository extends ServiceEntityRepository
         }
     }
 
-    private function applyOrganisatorAndSubscriptionAndAncientFilters($qb, $filters, $user)
+    private function applyOrganizerAndSubscriptionFilters($qb, $filters, $user)
     {
-        // Initialisation des conditions et des paramètres
-        $conditions = [];
-        $params = [];
 
-        // Conditions basées sur le filtre "organisator"
-        if ($filters['organisatorTrip'] !== false) {
-            $conditions[] = 'o.parId = :userId';
-            $params['userId'] = $user->getId();  // Ajoute userId pour l'organisateur
+        if ($filters['subcribeTrip'] === true && $filters['notSubcribeTrip'] === true) {
+            return $qb->getQuery()->getResult();
         }
 
-        // Vérification des filtres d'inscription
-        $isSubcribed = $filters['subcribeTrip'] !== false;
-        $isNotSubcribed = $filters['notSubcribeTrip'] !== false;
-
-        // Si les deux filtres d'inscription sont activés, ne rien filtrer
-        if ($isSubcribed && $isNotSubcribed) {
-            $qb->andWhere('1 = 1'); // Cela ne filtre rien
-        } elseif ($isSubcribed) {
-            // Condition pour "inscrit"
-            $conditions[] = 'sub.subParticipantId = :userId';
-            $params['userId'] = $user->getId();
-        } elseif ($isNotSubcribed) {
-            // Condition pour "non inscrit"
-            $conditions[] = '(sub.subParticipantId IS NULL OR sub.subParticipantId != :userId)';
-            $params['userId'] = $user->getId(); // Assure que le paramètre userId est lié
+        // Filtrer les voyages organisés par l'utilisateur
+        if ($filters['organisatorTrip'] === true) {
+            $qb->orWhere('t.triOrganiser = :user')
+                ->setParameter('user', $user);
         }
 
-        // Si le filtre des "Sorties passées" est activé
-        if ($filters['ancientTrip'] !== false) {
-            $conditions[] = 't.triStartingDate < :now';
-            $params['now'] = new \DateTime();
+        // Voyages auxquels l'utilisateur est inscrit
+        if ($filters['subcribeTrip'] === true) {
+            $qb->join('t.triSubscribes', 's1')
+                ->orWhere('s1.subParticipantId = :user')
+                ->setParameter('user', $user);
         }
 
-        // Construire la requête en s'assurant de l'absence de conflits
-        if (!empty($conditions)) {
-            // Utiliser "AND" pour lier toutes les conditions
-            $qb->andWhere(implode(' AND ', $conditions));
+        // Voyages auxquels l'utilisateur n'est pas inscrit et n'est pas l'organisateur
+        if ($filters['notSubcribeTrip'] === true) {
+            // Effectuer une jointure gauche pour vérifier les abonnements
+            $qb->leftJoin('t.triSubscribes', 's2', 'WITH', 's2.subParticipantId = :user')
+                ->orWhere('s2.subParticipantId IS NULL');
 
-            // Appliquer les paramètres
-            foreach ($params as $key => $value) {
-                $qb->setParameter($key, $value);
+            // Si l'utilisateur est un organisateur, on ne filtre pas par organisateur
+            if ($filters['organisatorTrip'] === true) {
+                // Pas de condition andWhere sur l'organisateur
+                $qb->setParameter('user', $user);
+            } else {
+                // Si pas organisateur, alors on filtre pour ne pas inclure les voyages organisés par l'utilisateur
+                $qb->andWhere('t.triOrganiser != :user')
+                    ->setParameter('user', $user);
             }
         }
+
     }
-
-
-
-
-
-
-
-
-
-    //    /**
-    //     * @return Trip[] Returns an array of Trip objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('t.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Trip
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }
