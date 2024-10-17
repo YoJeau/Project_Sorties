@@ -26,6 +26,9 @@ security:
                 target: app_login
                 # where to redirect after logout
                 # target: app_any_route
+            remember_me:
+                secret: '%kernel.secret%' #required
+                lifetime: 1209600 # 2 weeks, required by RGPD
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -38,7 +41,7 @@ security:
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
-        - { path: ^/participant/edit, roles: ROLE_USER }
+        - { path: ^/participant, roles: ROLE_USER }
         - { path: ^/participant/new, roles: ROLE_ADMIN }
         - { path: ^/participant/activate, roles: ROLE_ADMIN }
         - { path: ^/participant/deactivate, roles: ROLE_ADMIN }
