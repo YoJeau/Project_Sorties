@@ -120,7 +120,7 @@ class ParticipantController extends AbstractController
     }
 
     /**
-     * Affiche le profil d'un participant.
+     * Displays a participant's profile.
      *
      * @param Participant $participant
      * @return Response
