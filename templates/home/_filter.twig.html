@@ -1,0 +1,57 @@
+
+<form action="{{ path('app_home') }}" class="d-flex flex-row justify-content-between" method="post">
+    <div class="d-flex flex-column">
+        <div class="d-flex flex-row mt-3">
+            <label for="name-site" class="me-2 form-label">Site: </label>
+            <select class="form-select" name="name-site" id="name-site">
+                <option value="" selected disabled>--Choisissez un site</option>
+                {% for site in sites %}
+                <option value="{{ site.getId() }}" {% if filters.site is defined and filters.site == site.getId() %}selected{% endif %}>{{ site.getSitName() }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="d-flex flex-row mt-3">
+            <label for="search-name-site" class="form-label me-2"> Le nom de la sortie contient </label>
+            <input class="form-control" type="text" name="search-name-site" id="search-name-site" value="{{ filters.searchName is defined ? filters.searchName : '' }}">
+        </div>
+        <div class="d-flex flex-row mt-3">
+            <label for="start-date" class="form-label me-2"> Entre</label>
+            <input
+                    class="form-control me-2"
+                    type="date"
+                    name="start-date"
+                    id="start-date"
+                    value="{{  filters.startDate is defined ? filters.startDate : '' }}"
+            >
+            <label for="end-date" class="form-label me-2"> et </label>
+            <input
+                    class="form-control"
+                    type="date"
+                    name="end-date"
+                    id="end-date"
+                    value="{{  filters.endDate is defined ? filters.endDate : '' }}"
+            >
+        </div>
+    </div>
+    <div class="d-flex flex-column ">
+        <div class="d-flex flex-row mt-3">
+            <input class="form-check-input me-2 checkbox" type="checkbox" value="yes" id="organisator-trip" name="organisator-trip" {% if filters.organisatorTrip is defined and filters.organisatorTrip %}checked{% endif %}>
+            <label class="form-check-label" for="organisator-trip">Sortie dont je suis l'organisateur/trice</label>
+        </div>
+        <div class="d-flex flex-row mt-3">
+            <input class="form-check-input me-2 checkbox" type="checkbox" value="yes" id="subcribed-trip" name="subcribed-trip" {% if filters.subcribeTrip is defined and filters.subcribeTrip %}checked{% endif %}>
+            <label class="form-check-label" for="subcribed-trip">Sortie auxquelles je suis inscrit/e</label>
+        </div>
+        <div class="d-flex flex-row mt-3">
+            <input class="form-check-input me-2 checkbox" type="checkbox" value="yes" id="not-subscribed-trip" name="not-subscribed-trip" {% if filters.notSubcribeTrip is defined and filters.notSubcribeTrip %}checked{% endif %}>
+            <label class="form-check-label" for="not-subscribed-trip">Sortie auxquelles je ne suis pas inscrit/e</label>
+        </div>
+        <div class="d-flex flex-row mt-3">
+            <input class="form-check-input me-2 checkbox" type="checkbox" value="yes" id="ancient-trip" name="ancient-trip" {% if filters.ancientTrip is defined and filters.ancientTrip %}checked{% endif %}>
+            <label class="form-check-label" for="ancient-trip">Sorties passées</label>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center align-items-center">
+        <button class="p-4 btn btn-outline-primary" type="submit" id="search-trip" name="search-trip"> Rechercher</button>
+    </div>
+</form>
