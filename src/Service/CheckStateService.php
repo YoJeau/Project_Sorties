@@ -81,7 +81,7 @@ class CheckStateService
         }
 
         if ($currentDate < $startDate && $isFull) {
-            $this->updateTripState($trip, 'Clôturéé');
+            $this->updateTripState($trip, 'Fermée');
         }
     }
 
@@ -89,7 +89,7 @@ class CheckStateService
     {
         $currentDate = new \DateTimeImmutable('now', $timezone);
         if ($currentDate > $endDate && $currentDate < $startDate) {
-            $this->updateTripState($trip, 'Fermée');
+            $this->updateTripState($trip, 'Clôturée');
         }
     }
 
