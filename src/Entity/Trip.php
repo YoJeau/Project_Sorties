@@ -19,14 +19,14 @@ class Trip
     #[ORM\Column(length: 30)]
     private ?string $triName = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $triStartingDate = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+    private ?\DateTimeImmutable $triStartingDate = null;
 
     #[ORM\Column]
     private ?int $triDuration = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $triClosingDate = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+    private ?\DateTimeImmutable $triClosingDate = null;
 
     #[ORM\Column]
     private ?int $triMaxInscriptionNumber = null;
@@ -82,12 +82,12 @@ class Trip
         return $this;
     }
 
-    public function getTriStartingDate(): ?\DateTimeInterface
+    public function getTriStartingDate(): ?\DateTimeImmutable
     {
         return $this->triStartingDate;
     }
 
-    public function setTriStartingDate(\DateTimeInterface $triStartingDate): static
+    public function setTriStartingDate(\DateTimeImmutable $triStartingDate): static
     {
         $this->triStartingDate = $triStartingDate;
 
@@ -106,12 +106,12 @@ class Trip
         return $this;
     }
 
-    public function getTriClosingDate(): ?\DateTimeInterface
+    public function getTriClosingDate(): ?\DateTimeImmutable
     {
         return $this->triClosingDate;
     }
 
-    public function setTriClosingDate(\DateTimeInterface $triClosingDate): static
+    public function setTriClosingDate(\DateTimeImmutable $triClosingDate): static
     {
         $this->triClosingDate = $triClosingDate;
 
