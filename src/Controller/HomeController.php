@@ -57,7 +57,7 @@ class HomeController extends AbstractController
             $trips = $paginator->paginate($filteredTrips, $request->query->getInt('page', 1), 10);
         } else {
             $this->checkStateService->checkState();
-            $trips = $this->tripRepository->findAll();
+            $trips = $this->tripRepository->findNonArchivedTrips();
             $trips = $paginator->paginate($trips, $request->query->getInt('page', 1), 10);
         }
         $actions = $this->actionService->determineAction($this->getUser(), $trips);

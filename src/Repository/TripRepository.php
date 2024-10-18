@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\State;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\Trip;
@@ -13,10 +14,18 @@ class TripRepository extends ServiceEntityRepository
         parent::__construct($registry, Trip::class);
     }
 
+    public function findNonArchivedTrips(){
+        return $this->createQueryBuilder('t')
+            ->join('t.triState','s')
+            ->where('s.staLabel != :state')
+            ->setParameter('state',State::STATE_ARCHIVED)
+            ->getQuery()
+            ->getResult();
+    }
     public function getFilteredTrips($filters, $user)
     {
-        $qb = $this->createQueryBuilder('t'); // 't' est l'alias de Trip
-
+        $qb = $this->createQueryBuilder('t');
+        $qb->join('t.triState', 's');
         $this->applyOrganizerAndSubscriptionFilters($qb, $filters, $user);
 
         if ($filters['ancientTrip'] === true) {
@@ -27,6 +36,8 @@ class TripRepository extends ServiceEntityRepository
         $this->applyNameFilter($qb, $filters);
         $this->applyDateFilters($qb, $filters);
         $this->applySiteFilter($qb, $filters);
+        $qb->andWhere('s.staLabel != :archived')
+            ->setParameter('archived', State::STATE_ARCHIVED);
 
         return $qb->getQuery()->getResult();
     }
@@ -96,6 +107,5 @@ class TripRepository extends ServiceEntityRepository
                     ->setParameter('user', $user);
             }
         }
-
     }
 }
