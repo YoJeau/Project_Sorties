@@ -26,6 +26,6 @@ final class Version20241017132215 extends AbstractMigration
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE trip CHANGE tri_starting_date tri_starting_date DATETIME NOT NULL, CHANGE tri_closing_date tri_closing_date DATETIME NOT NULL');
+        $this->addSql('ALTER TABLE trip CHANGE tri_starting_date tri_starting_date DATE NOT NULL, CHANGE tri_closing_date tri_closing_date DATE NOT NULL');
     }
 }
