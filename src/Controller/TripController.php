@@ -203,7 +203,7 @@ class TripController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $state = $stateRepository->find(5);
+            $state = $stateRepository->findOneBy(['staLabel' => State::STATE_CANCELLED]);
             $trip->setTriState($state);
 
             $entityManager->flush();
