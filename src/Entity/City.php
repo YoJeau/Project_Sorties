@@ -15,9 +15,13 @@ class City
     #[ORM\Column]
     private ?int $citId = null;
 
+    #[Assert\NotBlank(message: "Veuillez renseigner le nom de la ville.")]
+    #[Assert\Length(min: 1, max: 30, maxMessage: "Maximum {{ limit }} caractères.")]
     #[ORM\Column(length: 30)]
     private ?string $citName = null;
 
+    #[Assert\NotBlank(message: "Veuillez renseigner le code postal.")]
+    #[Assert\Length(min: 1, max: 5, maxMessage: "Maximum {{ limit }} caractères.")]
     #[ORM\Column(length: 5)]
     private ?string $citPostCode = null;
 
