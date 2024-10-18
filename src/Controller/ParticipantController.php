@@ -126,8 +126,12 @@ class ParticipantController extends AbstractController
      * @return Response
      */
     #[Route('/{id}', name: '_show', methods: ['GET'])]
-    public function show(Participant $participant): Response
+    public function show(#[CurrentUser] ?Participant $currentParticipant, Participant $participant): Response
     {
+        if ($currentParticipant && $currentParticipant->getId() === $participant->getId()) {
+            return $this->redirectToRoute('app_participant_my-profile');
+        }
+
         return $this->render('participant/show.html.twig', [
             'participant' => $participant,
         ]);

@@ -1,14 +1,16 @@
 <div class="container">
-    <table class="table table-hover" name="trip-list" id="trip-list">
+    <table class="table table-hover" id="trip-list">
         <thead class="border border-primary">
-            <th scope="col">Nom de la sortie</th>
-            <th scope="col">Date de la sortie</th>
-            <th scope="col">Clôture</th>
-            <th scope="col">Inscrits/place</th>
-            <th scope="col">Etat</th>
-            <th scope="col">Inscrit</th>
-            <th scope="col">Organisateur</th>
-            <th scope="col"> Actions</th>
+            <tr>
+                <th scope="col">Nom de la sortie</th>
+                <th scope="col">Date de la sortie</th>
+                <th scope="col">Clôture</th>
+                <th scope="col">Inscrits/place</th>
+                <th scope="col">Etat</th>
+                <th scope="col">Inscrit</th>
+                <th scope="col">Organisateur</th>
+                <th scope="col"> Actions</th>
+            </tr>
         </thead>
         <tbody>
             {% if trips|length > 0 %}
@@ -39,7 +41,11 @@
                     <span class="badge rounded-pill bg-info">Inscrit</span>
                     {% endif %}
                 </td>
-                <td>{{ trip.getTriOrganiser().getParFirstName() }} {{ trip.getTriOrganiser().getParLastName() }}</td>
+                <td>
+                    <a href="{{ path('app_participant_show', {'id': trip.getTriOrganiser().getId() }) }}">
+                        {{ trip.getTriOrganiser().getParFirstName() }} {{ trip.getTriOrganiser().getParLastName() }}
+                    </a>
+                </td>
                 <td>
                     {% for action in actions %}
                     {% if action['tripId'] == trip.getId() %}
