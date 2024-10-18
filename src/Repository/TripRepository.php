@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\State;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\Trip;
@@ -17,7 +18,7 @@ class TripRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('t')
             ->join('t.triState','s')
             ->where('s.staLabel != :state')
-            ->setParameter('state','Archivée')
+            ->setParameter('state',State::STATE_ARCHIVED)
             ->getQuery()
             ->getResult();
     }
@@ -35,8 +36,8 @@ class TripRepository extends ServiceEntityRepository
         $this->applyNameFilter($qb, $filters);
         $this->applyDateFilters($qb, $filters);
         $this->applySiteFilter($qb, $filters);
-        $qb->andWhere('s.staLabel != :archived') // Exclure les trips archivés
-            ->setParameter('archived', 'Archivée'); // Remplacez 'archivé' par la valeur appropriée dans votre base de données
+        $qb->andWhere('s.staLabel != :archived')
+            ->setParameter('archived', State::STATE_ARCHIVED);
 
         return $qb->getQuery()->getResult();
     }
