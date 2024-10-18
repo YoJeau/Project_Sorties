@@ -36,6 +36,7 @@ class LocationType extends AbstractType
                 'label' => "Ville",
                 'class' => City::class,
                 'choice_label' => 'citName',
+                'placeholder' => "-- Choisir une ville --",
             ])
         ;
     }

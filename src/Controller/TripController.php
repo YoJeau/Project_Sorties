@@ -116,6 +116,13 @@ class TripController extends AbstractController
             "cityForm" => $cityForm,
         ]);
     }
+    #[Route('/update/{id}', name: '_update')]
+    function updateTrip(Request $request,Trip $trip): Response {
+        $tripForm = $this->createForm(TripType::class, $trip);
+        return $this->render('trip/new.html.twig', [
+            "tripForm" => $tripForm,
+        ]);
+    }
 
     #[Route('/search-location/{id}', name:'_searchLocation')]
     public function searchLocation(Request $request, LocationRepository $locationRepository): Response {

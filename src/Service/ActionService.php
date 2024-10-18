@@ -72,7 +72,7 @@ class ActionService
                 return $viewLink; // Lien "Afficher" uniquement
 
             case 'En Création':
-                return $this->getCreationStateActions($isOrganisator, $viewLink);
+                return $this->getCreationStateActions($isOrganisator,$id, $viewLink);
 
             default:
                 return "Aucune action disponible";
@@ -107,11 +107,11 @@ class ActionService
         return $viewLink;
     }
 
-    private function getCreationStateActions($isOrganisator, $viewLink)
+    private function getCreationStateActions($isOrganisator,$id, $viewLink)
     {
         if ($isOrganisator) {
             // L'organisateur peut modifier ou publier
-            return "<a href='' class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Modifier</span></a>".
+            return "<a href='".$this->generatePath('app_trip_update', $id)."' class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Modifier</span></a>".
                 "<a href='' class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Publier</span></a>";
         }
         return "Aucune action disponible";
