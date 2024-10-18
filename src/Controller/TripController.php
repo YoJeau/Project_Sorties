@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\City;
 use App\Entity\Location;
 use App\Entity\Participant;
+use App\Entity\State;
 use App\Entity\Trip;
 use App\Form\CityType;
 use App\Form\LocationType;
@@ -81,7 +82,11 @@ class TripController extends AbstractController
             return $this->redirectToRoute('app_home');
         }
 
-        if ($trip->getTriState()->getId() !== 3 && $trip->getTriState()->getId() !== 4 && $trip->getTriState()->getId() !== 7) {
+        if (
+            $trip->getTriState()->getStaLabel() !== State::STATE_OPEN
+            && $trip->getTriState()->getStaLabel() !== State::STATE_CREATED
+            && $trip->getTriState()->getStaLabel() !== State::STATE_CLOSED_SUBSCRIBE
+        ) {
             $this->addFlash('danger', "La sortie ne peux pas être annulée.");
 
             return $this->redirectToRoute('app_home');
