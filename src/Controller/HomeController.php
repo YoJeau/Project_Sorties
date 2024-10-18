@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Site;
+use App\Entity\State;
 use App\Repository\SiteRepository;
 use App\Repository\TripRepository;
 use App\Service\ActionService;
@@ -61,12 +62,22 @@ class HomeController extends AbstractController
             $trips = $paginator->paginate($trips, $request->query->getInt('page', 1), 10);
         }
         $actions = $this->actionService->determineAction($this->getUser(), $trips);
-
+        $stateColors = [
+            State::STATE_COMPLETED => "table-dark",
+            State::STATE_OPEN => "table-light",
+            State::STATE_CREATED => "table-primary",
+            State::STATE_CLOSED_SUBSCRIBE => "table-warning",
+            State::STATE_CANCELLED => "table-danger",
+            State::STATE_CLOSED => "table-secondary",
+            State::STATE_IN_PROGRESS => "table-success",
+            State::STATE_ARCHIVED => "table-dark"
+        ];
         return $this->render('home/index.html.twig', [
             'sites' => $sites,
             'trips' => $trips,
             'actions' => $actions,
             'filters' => $filters,
+            'stateColors' => $stateColors,
         ]);
     }
 }
