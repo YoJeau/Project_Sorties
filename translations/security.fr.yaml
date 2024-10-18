@@ -1,0 +1,4 @@
+security:
+  An authentication exception occurred. : "Une erreur d'authentification est survenue."
+  Authentication credentials could not be found. : "Les identifiants d'authentification n'ont pas été trouvés."
+  Invalid credentials. : "Identifiants incorrects."

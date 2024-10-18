@@ -29,7 +29,7 @@
 
                 <div class="togglePublier form-check form-switch d-flex justify-content-center mt-3 gap-3">
                     <input id="inputPublier" class="form-check-input" type="checkbox" checked>
-                    <label class="form-check-label align-content-center" for="flexSwitchCheckChecked">Publier la sortie</label>
+                    <label class="form-check-label align-content-center" for="inputPublier">Publier la sortie</label>
                 </div>
 
             </div>
@@ -88,7 +88,7 @@
             <button type="submit" class="btn btn-danger">Annuler</button>
         </div>
 
-        {{ form_end(tripForm) }}
+        {{ form_end(tripForm, {'render_rest': false}) }}
 
 
 </div>
