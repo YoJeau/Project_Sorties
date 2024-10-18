@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\State;
 use App\Entity\Subscribe;
 use App\Repository\SubscribeRepository;
 use App\Repository\TripRepository;
@@ -24,14 +25,13 @@ class SubscribeService
         $isPossible &= $this->checkState($trip);
 
         if ($isPossible) {
-           $subscribe = new Subscribe();
-
-           $subscribe->setSubTripId($trip);
-           $subscribe->setSubParticipantId($user);
-           $trip->addSubscribe($subscribe);
-           $this->entityManager->persist($subscribe);
-           $this->entityManager->flush();
-           return true;
+            $subscribe = new Subscribe();
+            $subscribe->setSubTripId($trip);
+            $subscribe->setSubParticipantId($user);
+            $trip->addSubscribe($subscribe);
+            $this->entityManager->persist($subscribe);
+            $this->entityManager->flush();
+            return true;
         }
         return false;
     }
@@ -83,7 +83,7 @@ class SubscribeService
 
     public function checkState($trip){
         $state = $trip->getTriState()->getStaLabel();
-        if($state === 'Ouverte' || $state === 'Fermée') return true;
+        if($state === State::STATE_OPEN || $state === State::STATE_CLOSED) return true;
         return false;
     }
 }

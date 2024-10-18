@@ -53,7 +53,7 @@ class ActionService
     public function chooseAction($state, $isSubcribed, $isOrganisator, $id)
     {
         // Générer le lien "Afficher" commun à tous les états
-        $viewLink = "<a href=''> <span class='badge rounded-pill bg-info'>Afficher</span></a>";
+        $viewLink = "<a href='' class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Afficher</span></a>";
 
         // Vérifier l'état pour déterminer les actions possibles
         switch ($state) {
@@ -82,15 +82,15 @@ class ActionService
         if ($isSubcribed) {
             // Utilisateur inscrit
             return $viewLink .
-                "<a href='".$this->generatePath('app_subscribe_delete', $id)."'> <span class='badge rounded-pill bg-info'>Se désister</span></a>";
+                "<a href='".$this->generatePath('app_subscribe_delete', $id)."'  class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Se désister</span></a>";
         } elseif ($isOrganisator) {
             // Organisateur de l'événement
             return $viewLink .
-                "<a href=''> <span class='badge rounded-pill bg-info'>Annuler</span></a>";
+                "<a href=''  class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Annuler</span></a>";
         } else {
             // Pas encore inscrit
             return $viewLink .
-                "<a href='".$this->generatePath('app_subscribe', $id)."'> <span class='badge rounded-pill bg-info'>S'inscrire</span></a>";
+                "<a href='".$this->generatePath('app_subscribe', $id)."'  class='text-decoration-none'> <span class='badge rounded-pill bg-info'>S'inscrire</span></a>";
         }
     }
 
@@ -99,7 +99,7 @@ class ActionService
         if ($isSubcribed) {
             // Inscrit à un événement fermé
             return $viewLink .
-                "<a href='".$this->generatePath('app_subscribe_delete', $id)."'> <span class='badge rounded-pill bg-info'>Se désister</span></a>";
+                "<a href='".$this->generatePath('app_subscribe_delete', $id)."'  class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Se désister</span></a>";
         }
         // Seulement le lien "Afficher" si non inscrit
         return $viewLink;
@@ -109,8 +109,8 @@ class ActionService
     {
         if ($isOrganisator) {
             // L'organisateur peut modifier ou publier
-            return "<a href=''> <span class='badge rounded-pill bg-info'>Modifier</span></a>".
-                "<a href=''> <span class='badge rounded-pill bg-info'>Publier</span></a>";
+            return "<a href='' class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Modifier</span></a>".
+                "<a href='' class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Publier</span></a>";
         }
         return "Aucune action disponible";
     }

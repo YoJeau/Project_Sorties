@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\State;
 use App\Repository\StateRepository;
 use App\Repository\TripRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -34,7 +35,7 @@ class CheckStateService
 
 
             // Ignorer les trips en "En création", "Terminée" ou "Annulée"
-            if ($state === 'En Création' || $state === 'Annulée') {
+            if ($state === State::STATE_CREATED || $state === State::STATE_CANCELLED || $state === State::STATE_ARCHIVED) {
                 continue;
             }
 
@@ -43,6 +44,7 @@ class CheckStateService
             $this->checkOpenState($trip,$startDate, $timezone);
             $this->checkInProgressState($trip, $startDate, $timezone);
             $this->checkedClosedState($trip, $startDate, $endDate, $timezone);
+            $this->checkedArchiveTrip($trip,$startDate,$timezone);
         }
         $this->entityManager->flush();
     }
@@ -60,12 +62,12 @@ class CheckStateService
 
 
         if ($currentDate >= $startDate && $currentDate <= $endDate) {
-            $this->updateTripState($trip, 'En Cours');
+            $this->updateTripState($trip, State::STATE_IN_PROGRESS);
         }
 
         // Vérification de l'état "Terminée"
         if ($currentDate > $endDate) {
-            $this->updateTripState($trip, 'Terminée');
+            $this->updateTripState($trip, State::STATE_COMPLETED);
         }
     }
 
@@ -77,11 +79,11 @@ class CheckStateService
         $isFull = $maxSubcribe == $subscribes;
         $currentDate = new \DateTimeImmutable('now', $timezone);
         if ($currentDate < $startDate && !$isFull) {
-            $this->updateTripState($trip, 'Ouverte');
+            $this->updateTripState($trip, State::STATE_OPEN);
         }
 
         if ($currentDate < $startDate && $isFull) {
-            $this->updateTripState($trip, 'Fermée');
+            $this->updateTripState($trip, State::STATE_CLOSED);
         }
     }
 
@@ -89,8 +91,23 @@ class CheckStateService
     {
         $currentDate = new \DateTimeImmutable('now', $timezone);
         if ($currentDate > $endDate && $currentDate < $startDate) {
-            $this->updateTripState($trip, 'Clôturée');
+            $this->updateTripState($trip, State::STATE_CLOSED_SUBSCRIBE);
         }
+    }
+
+    /**
+     * @throws \DateMalformedStringException
+     * @throws \DateInvalidOperationException
+     */
+    public function checkedArchiveTrip($trip, $startDate, $timezone){
+        $currentDate = new \DateTimeImmutable('now', $timezone);
+        $month = new \DateInterval('P1M');
+        $limitDate = $currentDate->sub($month);
+
+        if($startDate < $limitDate){
+            $this->updateTripState($trip,State::STATE_ARCHIVED);
+        }
+
     }
 
     private function updateTripState($trip, $newStateLabel)
