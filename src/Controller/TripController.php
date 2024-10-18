@@ -9,6 +9,7 @@ use App\Entity\Trip;
 use App\Form\CityType;
 use App\Form\LocationType;
 use App\Form\TripType;
+use App\Repository\StateRepository;
 use App\Repository\TripRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -46,24 +47,41 @@ class TripController extends AbstractController
         ]);
     }
 
+    /**
+     * Cancel a trip.
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $entityManager
+     * @param TripRepository $tripRepository
+     * @param StateRepository $stateRepository
+     * @param Participant|null $currentParticipant
+     * @param int $id Trip id
+     * @return Response
+     */
     #[Route('/cancel/{id}', name: '_cancel', methods: ['GET', 'POST'])]
-//    public function cancel(Request $request, EntityManagerInterface $entityManager, #[CurrentUser] ?Participant $currentParticipant, Trip $trip): Response {
-    public function cancel(Request $request, EntityManagerInterface $entityManager, TripRepository $tripRepository, #[CurrentUser] ?Participant $currentParticipant, int $id): Response {
+    public function cancel(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        TripRepository $tripRepository,
+        StateRepository $stateRepository,
+        #[CurrentUser] ?Participant $currentParticipant,
+        int $id
+    ): Response {
         $trip = $tripRepository->find($id);
 
         if (is_null($trip)) {
-            $this->addFlash('danger', "Cette sortie n'existe pas.");
+            $this->addFlash('danger', "La sortie n'existe pas.");
 
             return $this->redirectToRoute('app_home');
         }
 
         if ($currentParticipant && $currentParticipant->getId() !== $trip->getTriOrganiser()->getId()) {
-            $this->addFlash('danger', "Vous n'êtes pas l'organisateur de cette sortie.");
+            $this->addFlash('danger', "Vous n'êtes pas l'organisateur de la sortie.");
 
             return $this->redirectToRoute('app_home');
         }
 
-        if ($trip->getTriState()->getId() !== 3 && $trip->getTriState()->getId() !== 4) {
+        if ($trip->getTriState()->getId() !== 3 && $trip->getTriState()->getId() !== 4 && $trip->getTriState()->getId() !== 7) {
             $this->addFlash('danger', "La sortie ne peux pas être annulée.");
 
             return $this->redirectToRoute('app_home');
@@ -72,11 +90,12 @@ class TripController extends AbstractController
         $form = $this->createForm(TripType::class, $trip);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-            dd($form);
-        }
         if ($form->isSubmitted() && $form->isValid()) {
+            $state = $stateRepository->find(5);
+            $trip->setTriState($state);
+
             $entityManager->flush();
+            $this->addFlash('success', 'La sortie a bien été annulée.');
 
             return $this->redirectToRoute('app_home');
         }

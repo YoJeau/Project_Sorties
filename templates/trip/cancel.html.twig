@@ -14,6 +14,7 @@
     {{ form_widget(form.triDescription, {'attr': {'hidden': true}}) }}
     {{ form_widget(form.triState, {'attr': {'hidden': true}}) }}
     {{ form_widget(form.triOrganiser, {'attr': {'hidden': true}}) }}
+    {{ form_row(form._token) }}
     <div class="d-flex justify-content-center p-3">
         <h1>Annuler une sortie</h1>
     </div>
@@ -65,5 +66,5 @@
             <button type="button" class="btn btn-danger btn-lg">Annuler</button>
         </a>
     </div>
-{{ form_end(form, {'render_rest': false}) }}
+{{ form_end(form) }}
 {% endblock %}
