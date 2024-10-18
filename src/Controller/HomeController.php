@@ -38,8 +38,10 @@ class HomeController extends AbstractController
     public function index(Request $request, PaginatorInterface $paginator, FilterService $filterService): Response
     {
         if (!$this->getUser()) return $this->redirectToRoute('app_login');
+
         $sites = $this->siteRepository->findAll();
         $filters = [];
+
         if ($request->isMethod('POST')) {
             $filters = [
                 'site' => $request->request->get('name-site'),
