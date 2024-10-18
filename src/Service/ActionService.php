@@ -2,6 +2,7 @@
 namespace App\Service;
 
 use App\Entity\Participant;
+use Knp\Component\Pager\Pagination\PaginationInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ActionService
@@ -14,9 +15,9 @@ class ActionService
      * Détermine l'action à réaliser pour chaque voyage.
      *
      * @param Participant $user   L'utilisateur.
-     * @param array $trips Un tableau d'objets Trip.
+     * @param PaginationInterface $trips Un tableau d'objets Trip.
      */
-    public function determineAction(Participant $user, array $trips): array
+    public function determineAction(Participant $user, PaginationInterface $trips): array
     {
         $actions = [];
         foreach ($trips as $row) {
