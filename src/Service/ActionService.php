@@ -1,6 +1,7 @@
 <?php
 namespace App\Service;
 
+use App\Entity\Participant;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ActionService
@@ -12,10 +13,10 @@ class ActionService
     /**
      * Détermine l'action à réaliser pour chaque voyage.
      *
-     * @param User $user   L'utilisateur.
-     * @param Trip[] $trips Un tableau d'objets Trip.
+     * @param Participant $user   L'utilisateur.
+     * @param array $trips Un tableau d'objets Trip.
      */
-    public function determineAction($user, $trips): array
+    public function determineAction(Participant $user, array $trips): array
     {
         $actions = [];
         foreach ($trips as $row) {

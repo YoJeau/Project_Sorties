@@ -71,11 +71,12 @@ class TripRepository extends ServiceEntityRepository
         }
     }
 
-    private function applyOrganizerAndSubscriptionFilters($qb, $filters, $user)
+    private function applyOrganizerAndSubscriptionFilters($qb, $filters, $user): void
     {
 
         if ($filters['subcribeTrip'] === true && $filters['notSubcribeTrip'] === true) {
-            return $qb->getQuery()->getResult();
+            $qb->getQuery()->getResult();
+            return;
         }
 
         // Filtrer les voyages organisés par l'utilisateur

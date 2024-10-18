@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TripRepository::class)]
 class Trip
@@ -16,21 +17,30 @@ class Trip
     #[ORM\Column]
     private ?int $triId = null;
 
+    #[Assert\NotBlank(message: 'Veuillez renseigner le nom de la sortie.')]
+    #[Assert\Length(max: 30, maxMessage: "Maximum {{ limit }} caractères.")]
     #[ORM\Column(length: 30)]
     private ?string $triName = null;
 
+    #[Assert\NotBlank(message: 'Veuillez renseigner la date et l\'heure de la sortie.')]
+    #[Assert\GreaterThanOrEqual(new \DateTimeImmutable('now'), message: "La date de sortie ne peut pas être inférieur à maintenant.")]
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $triStartingDate = null;
 
+    #[Assert\NotBlank(message: 'Veuillez renseigner la durée de la sortie.')]
     #[ORM\Column]
     private ?int $triDuration = null;
 
+    #[Assert\NotBlank(message: 'Veuillez renseigner une date limite d\'inscription.')]
+    #[Assert\GreaterThanOrEqual(new \DateTimeImmutable('now'), message: "La date de sortie ne peut pas être inférieur à maintenant.")]
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $triClosingDate = null;
 
+    #[Assert\NotBlank(message: 'Veuillez renseigner le nombre de place.')]
     #[ORM\Column]
     private ?int $triMaxInscriptionNumber = null;
 
+    #[Assert\NotBlank(message: 'Veuillez renseigner une description.')]
     #[ORM\Column(type: Types::TEXT)]
     private ?string $triDescription = null;
 
@@ -47,6 +57,7 @@ class Trip
     #[ORM\JoinColumn(name: 'tri_state', referencedColumnName: 'sta_id', nullable: false)]
     private ?State $triState = null;
 
+    #[Assert\NotBlank(message: 'Veuillez renseigner le lieu.')]
     #[ORM\ManyToOne(inversedBy: 'trips')]
     #[ORM\JoinColumn(name: 'tri_location', referencedColumnName: 'loc_id', nullable: false)]
     private ?Location $triLocation = null;
@@ -55,6 +66,7 @@ class Trip
     #[ORM\JoinColumn(name: 'tri_organiser', referencedColumnName: 'par_id', nullable: false)]
     private ?Participant $triOrganiser = null;
 
+    #[Assert\NotBlank(message: 'Veuillez renseigner la ville.')]
     #[ORM\ManyToOne(inversedBy: 'sitTrips')]
     #[ORM\JoinColumn(name: 'tri_site', referencedColumnName: 'sit_id', nullable: false)]
     private ?Site $triSite = null;
