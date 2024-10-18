@@ -14,6 +14,7 @@ use App\Repository\CityRepository;
 use App\Repository\LocationRepository;
 use App\Repository\StateRepository;
 use App\Repository\TripRepository;
+use App\Service\TripService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,6 +25,9 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 #[Route('/trip', name: 'app_trip')]
 class TripController extends AbstractController
 {
+    public function __construct(TripService $tripService){
+        $this->tripService = $tripService;
+    }
     #[Route]
     public function index(): Response
     {
@@ -117,10 +121,22 @@ class TripController extends AbstractController
         ]);
     }
     #[Route('/update/{id}', name: '_update')]
-    function updateTrip(Request $request,Trip $trip): Response {
+    function updateTrip(Request $request,Trip $trip,#[CurrentUser] ?Participant $participant): Response {
+        if(!$this->tripService->checkUpdate($trip,$participant)){
+            $this->addFlash('danger','Vous ne pouvez pas modifier cette sortie');
+            return $this->redirectToRoute('app_home');
+        }
+
+        $location = $trip->getTriLocation();
+        $city = $location->getLocCity();
         $tripForm = $this->createForm(TripType::class, $trip);
-        return $this->render('trip/new.html.twig', [
+        $locationForm = $this->createForm(LocationType::class, $location);
+        $cityForm = $this->createForm(CityType::class, $city);
+
+        return $this->render('trip/update.html.twig', [
             "tripForm" => $tripForm,
+            "locationForm" => $locationForm,
+            "cityForm" => $cityForm,
         ]);
     }
 
