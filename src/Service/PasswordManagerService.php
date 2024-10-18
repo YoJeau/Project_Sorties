@@ -7,7 +7,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class PasswordManagerService
 {
-    private $passwordHasher;
+    private UserPasswordHasherInterface $passwordHasher;
 
     public function __construct(UserPasswordHasherInterface $passwordHasher)
     {
@@ -19,10 +19,11 @@ class PasswordManagerService
         if ($currentPassword && !$this->passwordHasher->isPasswordValid($participant, $currentPassword)) {
             throw new \RuntimeException("Mot de passe incorrect");
         }
+
         if ($plainPassword !== $confirmPassword) {
             throw new \RuntimeException("Les mots de passe ne correspondent pas");
         }
-        // Hacher le nouveau mot de passe
+
         $participant->setPassword($this->passwordHasher->hashPassword($participant, $plainPassword));
     }
 }

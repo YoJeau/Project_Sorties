@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImageManagerService
 {
-    private $uploadPath;
+    private string $uploadPath;
 
     public function __construct(ParameterBagInterface $params)
     {
@@ -17,23 +17,20 @@ class ImageManagerService
 
     public function manageImage(Participant $participant, ?UploadedFile $pictureFile): void
     {
-        if ($pictureFile) {
-            $fileName = md5(uniqid()) . '.' . $pictureFile->guessExtension();
+        $fileName = md5(uniqid()) . '.' . $pictureFile->guessExtension();
 
-            try {
-                $pictureFile->move($this->uploadPath, $fileName);
-            } catch (FileException $e) {
-                throw new \RuntimeException("Erreur lors du téléchargement de l'image !");
+        // saves the image in the target folder
+        $pictureFile->move($this->uploadPath, $fileName);
+
+        // if the participant has an existing image, delete it from the server
+        if (!empty($participant->getParPicture())) {
+            $oldFileName = $participant->getParPicture();
+            $oldFilePath = $this->uploadPath . '/' . $oldFileName;
+
+            if (file_exists($oldFilePath)) {
+                unlink($oldFilePath);
             }
-
-            if (!empty($participant->getParPicture())) {
-                $oldFilePath = $this->uploadPath . '/' . $participant->getParPicture();
-                if (file_exists($oldFilePath)) {
-                    unlink($oldFilePath);
-                }
-            }
-
-            $participant->setParPicture($fileName);
         }
+        $participant->setParPicture($fileName);
     }
 }
