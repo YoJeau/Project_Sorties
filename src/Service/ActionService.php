@@ -88,7 +88,7 @@ class ActionService
         } elseif ($isOrganisator) {
             // Organisateur de l'événement
             return $viewLink .
-                "<a href=''  class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Annuler</span></a>";
+                "<a href='" . $this->generatePath('app_trip_cancel', $id) . "'  class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Annuler</span></a>";
         } else {
             // Pas encore inscrit
             return $viewLink .
