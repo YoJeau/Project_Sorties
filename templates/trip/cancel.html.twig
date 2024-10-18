@@ -18,45 +18,47 @@
     <div class="d-flex justify-content-center p-3">
         <h1>Annuler une sortie</h1>
     </div>
-    <div class="d-flex flex-row w-100 p-3 justify-content-end">
-        <div class="d-flex flex-row gap-3 justify-content-end">
-            <div class="d-flex w-25">
-                <p>Nom de la sortie :</p>
+    <div class="d-flex w-100 p-3 justify-content-end">
+        <div class="d-flex flex-column w-100">
+            <div class="d-flex flex-row gap-3 justify-content-end">
+                <div class="d-flex w-25">
+                    <p>Nom de la sortie :</p>
+                </div>
+                <div class="w-50">
+                    <p> {{ trip.triName }}</p>
+                </div>
             </div>
-            <div class="w-50">
-                <p> {{ trip.triName }}</p>
+            <div class="d-flex flex-row gap-3 justify-content-end">
+                <div class="d-flex w-25">
+                    <p>Date de la sortie :</p>
+                </div>
+                <div class="w-50">
+                    <p>{{ trip.triStartingDate | date('d/m/Y à H \\H i') }}</p>
+                </div>
             </div>
-        </div>
-        <div class="d-flex flex-row gap-3 justify-content-end">
-            <div class="d-flex w-25">
-                <p>Date de la sortie :</p>
+            <div class="d-flex flex-row gap-3 justify-content-end">
+                <div class="d-flex w-25">
+                    <p>Ville organisatrice :</p>
+                </div>
+                <div class="w-50">
+                    <p>{{ trip.triSite.sitName }}</p>
+                </div>
             </div>
-            <div class="w-50">
-                <p>{{ trip.triStartingDate | date('d/m/Y à H \\H i') }}</p>
+            <div class="d-flex flex-row gap-3 justify-content-end">
+                <div class="d-flex w-25">
+                    <p>Lieu :</p>
+                </div>
+                <div class="w-50">
+                    <p>{{ trip.triLocation.locStreet ~ ' ' ~ trip.triLocation.locCity.citPostCode ~ ' ' ~ trip.triLocation.locCity.citName }}</p>
+                </div>
             </div>
-        </div>
-        <div class="d-flex flex-row gap-3 justify-content-end">
-            <div class="d-flex w-25">
-                <p>Ville organisatrice :</p>
-            </div>
-            <div class="w-50">
-                <p>{{ trip.triSite.sitName }}</p>
-            </div>
-        </div>
-        <div class="d-flex flex-row gap-3 justify-content-end">
-            <div class="d-flex w-25">
-                <p>Lieu :</p>
-            </div>
-            <div class="w-50">
-                <p>{{ trip.triLocation.locStreet ~ ' ' ~ trip.triLocation.locCity.citPostCode ~ ' ' ~ trip.triLocation.locCity.citName }}</p>
-            </div>
-        </div>
-        <div class="d-flex flex-row gap-3 justify-content-end">
-            <div class="d-flex w-25">
-                <p>{{ form_label(form.triCancellationReason, 'Motif :') }}</p>
-            </div>
-            <div class="w-50">
-                <p>{{ form_widget(form.triCancellationReason, {'attr': {'class': 'w-75'}}) }}</p>
+            <div class="d-flex flex-row gap-3 justify-content-end">
+                <div class="d-flex w-25">
+                    <p>{{ form_label(form.triCancellationReason, 'Motif :') }}</p>
+                </div>
+                <div class="w-50">
+                    <p>{{ form_widget(form.triCancellationReason, {'attr': {'class': 'w-75'}}) }}</p>
+                </div>
             </div>
         </div>
     </div>
