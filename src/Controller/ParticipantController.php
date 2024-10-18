@@ -23,6 +23,7 @@ class ParticipantController extends AbstractController
      *
      * @param Request $request
      * @param EntityManagerInterface $entityManager
+     * @param UserPasswordHasherInterface $passwordHasher
      * @param Participant|null $participant
      * @return Response
      */
@@ -31,7 +32,8 @@ class ParticipantController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         UserPasswordHasherInterface $passwordHasher,
-        #[CurrentUser] ?Participant $participant): Response
+        #[CurrentUser] ?Participant $participant
+    ): Response
     {
         $picture = 'default.png';
 
@@ -114,6 +116,24 @@ class ParticipantController extends AbstractController
         return $this->render('participant/my-profile.html.twig', [
             'picture' => $picture,
             'form' => $form->createView()
+        ]);
+    }
+
+    /**
+     * Displays a participant's profile.
+     *
+     * @param Participant $participant
+     * @return Response
+     */
+    #[Route('/{id}', name: '_show', methods: ['GET'])]
+    public function show(#[CurrentUser] ?Participant $currentParticipant, Participant $participant): Response
+    {
+        if ($currentParticipant && $currentParticipant->getId() === $participant->getId()) {
+            return $this->redirectToRoute('app_participant_my-profile');
+        }
+
+        return $this->render('participant/show.html.twig', [
+            'participant' => $participant,
         ]);
     }
 }

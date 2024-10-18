@@ -6,6 +6,7 @@ use App\Entity\Site;
 use App\Repository\SiteRepository;
 use App\Repository\TripRepository;
 use App\Service\ActionService;
+use App\Service\CheckStateService;
 use App\Service\FilterService;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,17 +21,22 @@ class HomeController extends AbstractController
     public function __construct(
         SiteRepository $siteRepository,
         TripRepository $tripRepository,
-        ActionService $actionService
+        ActionService $actionService,
+        CheckStateService $checkStateService,
     ){
         $this->siteRepository = $siteRepository;
         $this->tripRepository = $tripRepository;
         $this->actionService = $actionService;
+        $this->checkStateService = $checkStateService;
     }
+
+    /**
+     * @throws \DateMalformedStringException
+     */
     #[Route('/', name: 'app_home', methods: ['GET', 'POST'])]
     public function index(Request $request, PaginatorInterface $paginator, FilterService $filterService): Response
     {
         if (!$this->getUser()) return $this->redirectToRoute('app_login');
-
         $sites = $this->siteRepository->findAll();
         $filters = [];
         if ($request->isMethod('POST')) {
@@ -50,9 +56,10 @@ class HomeController extends AbstractController
 
             $trips = $paginator->paginate($filteredTrips, $request->query->getInt('page', 1), 10);
         } else {
-            $trips = $paginator->paginate($this->tripRepository->findAll(), $request->query->getInt('page', 1), 10);
+            $this->checkStateService->checkState();
+            $trips = $this->tripRepository->findAll();
+            $trips = $paginator->paginate($trips, $request->query->getInt('page', 1), 10);
         }
-
         $actions = $this->actionService->determineAction($this->getUser(), $trips);
 
         return $this->render('home/index.html.twig', [
