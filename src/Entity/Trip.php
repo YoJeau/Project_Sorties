@@ -16,11 +16,11 @@ class Trip
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $triId = null;
+
     #[Assert\NotBlank(message: 'Veuillez renseigner le nom de la sortie.')]
     #[Assert\Length(max: 30, maxMessage: "Maximum {{ limit }} caractères.")]
     #[ORM\Column(length: 30)]
     private ?string $triName = null;
-
 
     #[Assert\NotBlank(message: 'Veuillez renseigner la date et l\'heure de la sortie.')]
     #[Assert\GreaterThanOrEqual(new \DateTimeImmutable('now'), message: "La date de sortie ne peut pas être inférieur à maintenant.")]
@@ -57,8 +57,8 @@ class Trip
     #[ORM\JoinColumn(name: 'tri_state', referencedColumnName: 'sta_id', nullable: false)]
     private ?State $triState = null;
 
-    #[ORM\ManyToOne(inversedBy: 'trips')]
     #[Assert\NotBlank(message: 'Veuillez renseigner le lieu.')]
+    #[ORM\ManyToOne(inversedBy: 'trips')]
     #[ORM\JoinColumn(name: 'tri_location', referencedColumnName: 'loc_id', nullable: false)]
     private ?Location $triLocation = null;
 
@@ -66,8 +66,8 @@ class Trip
     #[ORM\JoinColumn(name: 'tri_organiser', referencedColumnName: 'par_id', nullable: false)]
     private ?Participant $triOrganiser = null;
 
-    #[ORM\ManyToOne(inversedBy: 'sitTrips')]
     #[Assert\NotBlank(message: 'Veuillez renseigner la ville.')]
+    #[ORM\ManyToOne(inversedBy: 'sitTrips')]
     #[ORM\JoinColumn(name: 'tri_site', referencedColumnName: 'sit_id', nullable: false)]
     private ?Site $triSite = null;
 
@@ -94,12 +94,12 @@ class Trip
         return $this;
     }
 
-    public function getTriStartingDate(): ?\DateTimeInterface
+    public function getTriStartingDate(): ?\DateTimeImmutable
     {
         return $this->triStartingDate;
     }
 
-    public function setTriStartingDate(\DateTimeInterface $triStartingDate): static
+    public function setTriStartingDate(\DateTimeImmutable $triStartingDate): static
     {
         $this->triStartingDate = $triStartingDate;
 
@@ -118,12 +118,12 @@ class Trip
         return $this;
     }
 
-    public function getTriClosingDate(): ?\DateTimeInterface
+    public function getTriClosingDate(): ?\DateTimeImmutable
     {
         return $this->triClosingDate;
     }
 
-    public function setTriClosingDate(\DateTimeInterface $triClosingDate): static
+    public function setTriClosingDate(\DateTimeImmutable $triClosingDate): static
     {
         $this->triClosingDate = $triClosingDate;
 

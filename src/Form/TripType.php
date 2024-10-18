@@ -11,15 +11,11 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 class TripType extends AbstractType
 {
@@ -28,7 +24,7 @@ class TripType extends AbstractType
         $builder
             ->add('triName', TextType::class, [
                 'label' => 'Nom de la sortie',
-                'label_attr' => ['class' => 'w-50'],
+                'label_attr' => ['class' => 'w-50']
             ])
             ->add('triStartingDate', DateTimeType::class, [
                 'label' => 'Date et heure de la sortie',
@@ -64,18 +60,26 @@ class TripType extends AbstractType
                 'class' => Location::class,
                 'choice_label' => 'locName',
             ])
-//            ->add('triCancellationReason')
+            ->add('triCancellationReason', TextareaType::class, [
+                'label' => 'Motif',
+                'label_attr' => ['class' => 'w-100'],
+                'required' => false
+            ])
+            ->add('triOrganiser', EntityType::class, [
+                'class' => Participant::class,
+                'choice_label' => 'id',
+                'required' => false
+            ])
+            ->add('triState', EntityType::class, [
+                'class' => State::class,
+                'choice_label' => 'staLabel',
+                'required' => false
+            ])
             ->add('state', CheckboxType::class, [
                 'label' => "Publier la sortie",
                 'mapped' => false,
                 'required' => false,
             ])
-
-//            ->add('triOrganiser', EntityType::class, [
-//                'class' => Participant::class,
-//                'choice_label' => 'id',
-//            ])
-
         ;
     }
 
