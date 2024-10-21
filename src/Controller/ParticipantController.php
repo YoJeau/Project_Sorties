@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Participant;
 use App\Form\ParticipantType;
+use App\Repository\ParticipantRepository;
 use App\Service\ImageManagerService;
 use App\Service\PasswordManagerService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
@@ -24,6 +26,22 @@ class ParticipantController extends AbstractController
     public function __construct(ImageManagerService $imageManagerService, PasswordManagerService $passwordManagerService){
         $this->imageManagerService = $imageManagerService;
         $this->passwordManagerService = $passwordManagerService;
+    }
+
+    /**
+     * Displays the participant administration panel,
+     * with a list of participants and possible actions.
+     *
+     * @param ParticipantRepository $participantRepository
+     * @return Response
+     */
+    #[Route('/administration', name: '_administration', methods: ['GET'])]
+    public function administration(ParticipantRepository $participantRepository): Response
+    {
+        $participants = $participantRepository->findAll();
+        return $this->render('participant/index.html.twig', [
+            'participants' => $participants
+        ]);
     }
 
     /**
@@ -99,7 +117,7 @@ class ParticipantController extends AbstractController
      * @param Participant $participant
      * @return Response
      */
-    #[Route('/{id}', name: '_show', methods: ['GET'])]
+    #[Route('/show/{id}', name: '_show', methods: ['GET'])]
     public function show(#[CurrentUser] ?Participant $currentParticipant, Participant $participant): Response
     {
         if ($currentParticipant && $currentParticipant->getId() === $participant->getId()) {
@@ -108,6 +126,43 @@ class ParticipantController extends AbstractController
 
         return $this->render('participant/show.html.twig', [
             'participant' => $participant,
+        ]);
+    }
+
+    /**
+     * Create a new participant.
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $entityManager
+     * @param UserPasswordHasherInterface $passwordHasher
+     * @return Response
+     */
+    #[Route('/new', name: '_new', methods: ['GET', 'POST'])]
+    public function new(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        UserPasswordHasherInterface $passwordHasher
+    ): Response
+    {
+        $participant = new Participant();
+
+        $form = $this->createForm(ParticipantType::class, $participant);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $participant->setPassword($passwordHasher->hashPassword($participant, 'bonjour-ENI-123'));
+            $participant->setRoles(['ROLE_USER']);
+            $participant->setParIsActive(true);
+
+            $entityManager->persist($participant);
+            $entityManager->flush();
+
+
+            return $this->redirectToRoute('app_participant_administration');
+        }
+
+        return $this->render('participant/new.html.twig', [
+            'form' => $form
         ]);
     }
 
