@@ -197,7 +197,6 @@ class TripController extends AbstractController
     }
 
     /**
-
      * publish a trip on the trip board via its ID.
      *
      * @param EntityManagerInterface $entityManager
@@ -214,7 +213,8 @@ class TripController extends AbstractController
         CheckStateService $checkStateService,
         #[CurrentUser] ?Participant $currentParticipant,
         int $id
-    ): Response {
+    ): Response
+    {
         $trip = $tripRepository->find($id);
 
         if (is_null($trip)) {
@@ -235,13 +235,25 @@ class TripController extends AbstractController
             return $this->redirectToRoute('app_home');
         }
 
-        $checkStateService->checkTripState($trip);
+        try {
+            $checkStateService->checkTripState($trip);
+        } catch (\DateInvalidOperationException $e) {
+            $this->addFlash('danger', "Date invalide.");
+
+            return $this->redirectToRoute('app_home');
+        } catch (\DateMalformedStringException $e) {
+            $this->addFlash('danger', "Date invalide.");
+
+            return $this->redirectToRoute('app_home');
+        }
 
         $entityManager->flush();
         $this->addFlash('success', 'La sortie a bien été publiée.');
 
         return $this->redirectToRoute('app_home');
+    }
 
+    /**
      * Show a trip
      * @param Trip $trip
      * @return Response
