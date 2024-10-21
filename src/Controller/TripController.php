@@ -163,24 +163,20 @@ class TripController extends AbstractController
 
         $location = $trip->getTriLocation();
         $locationForm = $this->createForm(LocationType::class, $location);
-        $locationForm->handleRequest($request);
-
         $city = $location->getLocCity();
         $cityForm = $this->createForm(CityType::class, $city);
-        $cityForm->handleRequest($request);
-
         $tripForm = $this->createForm(TripType::class, $trip);
         $tripForm->handleRequest($request);
+        $locationForm->handleRequest($request);
+        $cityForm->handleRequest($request);
 
             if ($tripForm->isSubmitted() && $tripForm->isValid()) {
                 // Vérifier si la ville ou la localisation a été modifiée via les sélecteurs
                 $selectedCity = $tripForm->get('triLocation')->getData()->getLocCity();
                 $selectedLocation = $tripForm->get('triLocation')->getData();
-                $cityWithiD233 = $cityRepository->findOneBy(['citId' => 246]);
-                dd($city, $selectedCity,$cityWithiD233); // Débogage pour voir les valeurs
 
                 // Vérifier si la ville a été modifiée
-                if ($selectedCity && $selectedCity->getCitId() !== $city->getCitId()) { // Comparer les IDs
+                if ($selectedCity && $selectedCity->getId() !== $city->getId()) { // Comparer les IDs
                     // Vérifier si la ville existe déjà
                     $foundCity = $cityRepository->findOneBy([
                         'citName' => $selectedCity->getCitName()
@@ -215,7 +211,7 @@ class TripController extends AbstractController
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('trip/edit.html.twig', [
+        return $this->render('trip/update.html.twig', [
             "tripForm" => $tripForm->createView(),
             "locationForm" => $locationForm->createView(),
             "cityForm" => $cityForm->createView(),
