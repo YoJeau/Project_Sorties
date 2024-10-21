@@ -27,6 +27,13 @@ class ParticipantController extends AbstractController
         $this->passwordManagerService = $passwordManagerService;
     }
 
+    /**
+     * Displays the participant administration panel,
+     * with a list of participants and possible actions.
+     *
+     * @param ParticipantRepository $participantRepository
+     * @return Response
+     */
     #[Route('/administration', name: '_administration', methods: ['GET'])]
     public function administration(ParticipantRepository $participantRepository): Response
     {
@@ -121,6 +128,14 @@ class ParticipantController extends AbstractController
         ]);
     }
 
+    /**
+     * Create a new participant.
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $entityManager
+     * @param UserPasswordHasherInterface $passwordHasher
+     * @return Response
+     */
     #[Route('/new', name: '_new', methods: ['GET', 'POST'])]
     public function new(
         Request $request,
