@@ -88,8 +88,8 @@ class TripController extends AbstractController
             }
             //Vérifier s'il y a des données
             // Cas : l'utilisateur ajoute un lieu et une ville dans le formulaire
-            if (!empty($request->get('city')['locName']) || !empty($request->get('city')['locStreet']) ||
-                !empty($request->get('city')['locLatitude']) || !empty($request->get('city')['locLongitude']) ||
+            if (!empty($request->get('location')['locName']) || !empty($request->get('location')['locStreet']) ||
+                !empty($request->get('location')['locLatitude']) || !empty($request->get('location')['locLongitude']) ||
                 !empty($request->get('city')['citName']) || !empty($request->get('city')['citPostCode'])
             ) {
 
