@@ -193,4 +193,16 @@ class TripController extends AbstractController
             'form' => $form->createView()
         ]);
     }
+
+    /**
+     * Show a trip
+     * @param Trip $trip
+     * @return Response
+     */
+    #[Route('/{id}', name: '_show')]
+    public function show(Trip $trip): Response {
+        return $this->render('trip/show.html.twig', [
+           'trip' => $trip,
+        ]);
+    }
 }
