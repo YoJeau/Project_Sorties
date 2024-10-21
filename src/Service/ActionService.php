@@ -64,7 +64,7 @@ class ActionService
             'Ouverte' => $this->getOpenStateActions($isSubcribed, $isOrganisator, $id, $viewLink),
             'Fermée' => $this->getClosedStateActions($isSubcribed, $id, $viewLink),
             'Terminée', 'Clôturée', 'En Cours', 'Annulée' => $viewLink,
-            'En Création' => $this->getCreationStateActions($isOrganisator, $viewLink),
+            'En Création' => $this->getCreationStateActions($isOrganisator, $id),
             default => "Aucune action disponible",
         };
     }
@@ -101,7 +101,7 @@ class ActionService
         if ($isOrganisator) {
             // L'organisateur peut modifier ou publier
             $viewLink .= "<a href='' class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Modifier</span></a>".
-                "<a href='" . $this->generatePath('app_subscribe_delete', $id) . "' class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Publier</span></a>";
+                "<a href='" . $this->generatePath('app_trip_publish', $id) . "' class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Publier</span></a>";
         } else {
             $viewLink .= "Aucune action disponible";
         }

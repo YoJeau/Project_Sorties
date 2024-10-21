@@ -14,6 +14,7 @@ use App\Repository\CityRepository;
 use App\Repository\LocationRepository;
 use App\Repository\StateRepository;
 use App\Repository\TripRepository;
+use App\Service\CheckStateService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -151,7 +152,8 @@ class TripController extends AbstractController
         StateRepository $stateRepository,
         #[CurrentUser] ?Participant $currentParticipant,
         int $id
-    ): Response {
+    ): Response
+    {
         $trip = $tripRepository->find($id);
 
         if (is_null($trip)) {
@@ -192,5 +194,51 @@ class TripController extends AbstractController
             'trip' => $trip,
             'form' => $form->createView()
         ]);
+    }
+
+    /**
+     * publish a trip on the trip board via its ID.
+     *
+     * @param EntityManagerInterface $entityManager
+     * @param TripRepository $tripRepository
+     * @param CheckStateService $checkStateService
+     * @param Participant|null $currentParticipant
+     * @param int $id Trip id
+     * @return Response
+     */
+    #[Route('/publish/{id}', name: '_publish', methods: ['GET'])]
+    public function publish(
+        EntityManagerInterface $entityManager,
+        TripRepository $tripRepository,
+        CheckStateService $checkStateService,
+        #[CurrentUser] ?Participant $currentParticipant,
+        int $id
+    ): Response {
+        $trip = $tripRepository->find($id);
+
+        if (is_null($trip)) {
+            $this->addFlash('danger', "La sortie n'existe pas.");
+
+            return $this->redirectToRoute('app_home');
+        }
+
+        if ($currentParticipant && $currentParticipant->getId() !== $trip->getTriOrganiser()->getId()) {
+            $this->addFlash('danger', "Vous n'êtes pas l'organisateur de la sortie.");
+
+            return $this->redirectToRoute('app_home');
+        }
+
+        if ($trip->getTriState()->getStaLabel() !== State::STATE_CREATED) {
+            $this->addFlash('danger', "La sortie est déjà publiée.");
+
+            return $this->redirectToRoute('app_home');
+        }
+
+        $checkStateService->checkTripState($trip);
+
+        $entityManager->flush();
+        $this->addFlash('success', 'La sortie a bien été publiée.');
+
+        return $this->redirectToRoute('app_home');
     }
 }
