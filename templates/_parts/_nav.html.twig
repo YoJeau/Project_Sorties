@@ -8,14 +8,6 @@
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarColor01">
             <ul class="navbar-nav gap-5">
-                {% if app.user and is_granted('ROLE_ADMIN') %}
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#">Villes</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#">Sites</a>
-                    </li>
-                {% endif %}
                 <li class="nav-item">
                     <a class="nav-link active" href="{{ path('app_home') }}">Accueil</a>
                 </li>
@@ -23,6 +15,16 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="{{ path('app_participant_my-profile') }}">Mon profil</a>
                     </li>
+                    {% if app.user and is_granted('ROLE_ADMIN') %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link active dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Administration</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{{ path('app_participant_administration') }}">Participants</a>
+                                <a class="dropdown-item disabled" href="#">Villes</a>
+                                <a class="dropdown-item disabled" href="#">Sites</a>
+                            </div>
+                        </li>
+                    {% endif %}
                     <li class="nav-item">
                         <a class="nav-link active" href="{{ path('app_logout') }}">Se déconnecter</a>
                     </li>
