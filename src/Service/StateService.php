@@ -6,8 +6,9 @@ use App\Entity\State;
 use App\Repository\StateRepository;
 use App\Repository\TripRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
-class CheckStateService
+class StateService
 {
     public function __construct(TripRepository $tripRepository, StateRepository $stateRepository, EntityManagerInterface $entityManager)
     {
@@ -108,6 +109,25 @@ class CheckStateService
             $this->updateTripState($trip,State::STATE_ARCHIVED);
         }
 
+    }
+
+    public function getStateForm(Request $request): ?State
+    {
+        // Vérifier si un état est fourni dans la requête
+        if (isset($request->get('trip')['state'])) {
+            $stateLabel = State::STATE_OPEN; // État "Ouvert"
+        } else {
+            $stateLabel = State::STATE_CREATED; // État "Créé"
+        }
+
+        // Rechercher l'état dans la base de données
+        $state = $this->stateRepository->findOneBy(['staLabel' => $stateLabel]);
+
+        // Si l'état n'est pas trouvé, on lève une exception (ou tu peux gérer cela autrement)
+        if (!$state) {
+            throw new \Exception(sprintf('L\'état "%s" n\'existe pas dans la base de données.', $stateLabel));
+        }
+        return $state;
     }
 
     private function updateTripState($trip, $newStateLabel)

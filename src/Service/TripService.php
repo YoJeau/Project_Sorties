@@ -17,6 +17,7 @@ class TripService
         return false;
     }
 
+
     private function checkOrganiser(Trip $trip, Participant $participant){
         if($trip->getTriOrganiser()->getId() != $participant->getId()) return false;
         return true;
@@ -24,6 +25,11 @@ class TripService
 
     private function checkStateTrip(Trip $trip){
         if($trip->getTriState()->getStaLabel() != State::STATE_CREATED) return false;
+        return true;
+    }
+
+    public function checkDateTripForm(Trip $trip){
+        if($trip->getTriClosingDate() > $trip->getTriStartingDate()) return false;
         return true;
     }
 }

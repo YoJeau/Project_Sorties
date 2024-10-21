@@ -111,7 +111,7 @@ class ActionService
     {
         if ($isOrganisator) {
             // L'organisateur peut modifier ou publier
-            return "<a href='".$this->generatePath('app_trip_update', $id)."' class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Modifier</span></a>".
+            return "<a href='".$this->generatePath('app_trip_update_get', $id)."' class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Modifier</span></a>".
                 "<a href='' class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Publier</span></a>";
         }
         return "Aucune action disponible";

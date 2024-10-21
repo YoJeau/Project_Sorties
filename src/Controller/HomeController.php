@@ -7,7 +7,7 @@ use App\Entity\State;
 use App\Repository\SiteRepository;
 use App\Repository\TripRepository;
 use App\Service\ActionService;
-use App\Service\CheckStateService;
+use App\Service\StateService;
 use App\Service\FilterService;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,8 +22,8 @@ class HomeController extends AbstractController
     public function __construct(
         SiteRepository $siteRepository,
         TripRepository $tripRepository,
-        ActionService $actionService,
-        CheckStateService $checkStateService,
+        ActionService  $actionService,
+        StateService   $checkStateService,
     ){
         $this->siteRepository = $siteRepository;
         $this->tripRepository = $tripRepository;
