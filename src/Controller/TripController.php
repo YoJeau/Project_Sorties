@@ -150,90 +150,63 @@ class TripController extends AbstractController
     }
 
     #[Route('/update/{id}', name: 'app_trip_update_post', methods: ['POST'])]
-    public function updateTripPost(Trip $trip, Request $request, EntityManagerInterface $entityManager, #[CurrentUser] ?Participant $participant): Response
-    {
-        // Récupération de l'état depuis le formulaire
-        $state = $this->stateService->getStateForm($request);
-
-        // Récupération des formulaires pour les entités
-        $location = $trip->getTriLocation();
-        $city = $location->getLocCity();
-
+    public function updateTripPost(
+        Trip $trip,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        #[CurrentUser] ?Participant $participant
+    ): Response {
+        // Créer et gérer le formulaire du voyage
         $tripForm = $this->createForm(TripType::class, $trip);
         $tripForm->handleRequest($request);
 
+        // Créer une nouvelle instance de Location et gérer le formulaire de localisation
+        $location = new Location();
         $locationForm = $this->createForm(LocationType::class, $location);
         $locationForm->handleRequest($request);
 
+        // Créer une nouvelle instance de City et gérer le formulaire de ville
+        $city = new City();
         $cityForm = $this->createForm(CityType::class, $city);
         $cityForm->handleRequest($request);
 
-        // Vérification de la validité des dates
-        if (!$this->tripService->checkDateTripForm($trip)) {
-            $this->addFlash('danger', 'La date de clôture ne peut pas être supérieur à la date de sortie.');
-            return $this->redirectToRoute('app_trip_update_get', ['id' => $trip->getId()]);
-        }
-
+        // Vérifier si le formulaire du voyage a été soumis et est valide
         if ($tripForm->isSubmitted() && $tripForm->isValid()) {
+            // Récupérer les données de localisation
+            $locationData = $locationForm->getData();
 
-            // Vérifier s'il y a des données pour la ville et le lieu
-            if (!empty($request->get('city')['citName']) && !empty($request->get('city')['citPostCode'])) {
-                // Vérifier si la ville existe déjà
-                $foundCity = $this->cityService->findCity($request);
-
-                // Si la ville n'existe pas, crée-la
-                if ($foundCity === null) {
-                    $city = new City();
-                    $city->setCitName($request->get('city')['citName']);
-                    $city->setCitPostCode($request->get('city')['citPostCode']);
-
-                    // Persist the new city
-                    $entityManager->persist($city);
-
-                    // Associer la nouvelle ville à la localisation
-                    $location->setLocCity($city);
-                } else {
-                    // Si la ville existe, associe-la simplement à la localisation
-                    $location->setLocCity($foundCity);
-                }
-
-                // Mettez à jour les informations de localisation
-                $location->setLocName($request->get('location')['locName']);
-                $location->setLocStreet($request->get('location')['locStreet']);
-
-                // Convertir la latitude et la longitude en float
-                $latitude = $request->get('location')['locLatitude'];
-                $longitude = $request->get('location')['locLongitude'];
-
-                if (is_numeric($latitude)) {
-                    $location->setLocLatitude((float)$latitude);
-                }
-                if (is_numeric($longitude)) {
-                    $location->setLocLongitude((float)$longitude);
-                }
-
-                // Persist the updated location
-                $entityManager->persist($location);
+            // Vérifiez si la localisation a changé
+            if ($this->locationService->isNewLocationDifferent(
+                $locationData->getLocName(),
+                $locationData->getLocStreet(),
+                $locationData->getLocCity(),
+                $locationData->getLocLatitude(),
+                $locationData->getLocLongitude(),
+                $trip->getTriLocation()
+            )) {
+                // Créer et persister la nouvelle localisation
+                $entityManager->persist($locationData);
+                $trip->setTriLocation($locationData);
+            } else {
+                // Si pas de changement, garder l'ancienne localisation
+                $trip->setTriLocation($trip->getTriLocation());
             }
 
-// Ensuite, on met à jour le voyage
-            $trip->setTriLocation($location);
-            $trip->setTriState($state);
+            // Mettre à jour l'état et l'organisateur du voyage
+            $trip->setTriState($this->stateService->getStateForm($request));
             $trip->setTriOrganiser($participant);
+
+            // Persist the updated trip
             $entityManager->persist($trip);
             $entityManager->flush();
 
-
-            $this->addFlash('success', 'Votre sortie a bien été mise à jour');
-            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectWithFlash('success', 'Votre sortie a bien été mise à jour', 'app_home');
         }
 
-        return $this->render('trip/new.html.twig', [
-            "tripForm" => $tripForm->createView(),
-            "locationForm" => $locationForm->createView(),
-            "cityForm" => $cityForm->createView(),
-        ]);
+        // Rendu du formulaire avec les vues
+        return $this->renderTripForm($tripForm, $locationForm, $cityForm);
     }
+
 
 
 
@@ -313,4 +286,26 @@ class TripController extends AbstractController
             'form' => $form->createView()
         ]);
     }
+
+    /**
+     * Redirige avec un message flash.
+     */
+    private function redirectWithFlash(string $type, string $message, string $route, array $params = []): Response {
+        $this->addFlash($type, $message);
+        return $this->redirectToRoute($route, $params);
+    }
+
+    /**
+     * Rend le formulaire de voyage avec les formulaires de localisation et de ville.
+     */
+    private function renderTripForm($tripForm, $handledLocation): Response {
+        return $this->render('trip/new.html.twig', [
+            "tripForm" => $tripForm->createView(),
+            "locationForm" => $this->createForm(LocationType::class, $handledLocation)->createView(),
+            "cityForm" => $this->createForm(CityType::class, $handledLocation->getLocCity())->createView(),
+        ]);
+    }
+
+
+
 }

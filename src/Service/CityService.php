@@ -18,14 +18,13 @@ class CityService
         $this->entityManager = $entityManager;
     }
 
-    public function findOrCreateCity(Request $request): ?City
+    public function findOrCreateCity(array $cityData): ?City
     {
-        $cityData = $request->get('city');
         if (empty($cityData['citName']) || empty($cityData['citPostCode'])) {
-            return null;  // Pas assez d'informations pour traiter la ville
+            return null; // Pas assez d'informations pour traiter la ville
         }
 
-        // Cherche la ville par nom et code postal
+        // Chercher la ville par nom et code postal
         $foundCity = $this->cityRepository->findOneBy([
             'citName' => $cityData['citName'],
             'citPostCode' => $cityData['citPostCode']
@@ -37,16 +36,10 @@ class CityService
             $city->setCitName($cityData['citName']);
             $city->setCitPostCode($cityData['citPostCode']);
 
-//            $this->entityManager->persist($city);
+            $this->entityManager->persist($city);
             return $city;
         }
-        return $foundCity;  // Retourne la ville existante
-    }
 
-    public function findCity(Request $request): ?City{
-        return $this->cityRepository->findOneBy(
-            ['citName' => $request->get('city')['citName'],
-                'citPostCode' => $request->get('city')['citPostCode']]
-        );
+        return $foundCity; // Retourne la ville existante
     }
 }
