@@ -197,6 +197,7 @@ class TripController extends AbstractController
     }
 
     /**
+
      * publish a trip on the trip board via its ID.
      *
      * @param EntityManagerInterface $entityManager
@@ -240,5 +241,16 @@ class TripController extends AbstractController
         $this->addFlash('success', 'La sortie a bien été publiée.');
 
         return $this->redirectToRoute('app_home');
+
+     * Show a trip
+     * @param Trip $trip
+     * @return Response
+     */
+    #[Route('/{id}', name: '_show')]
+    public function show(Trip $trip): Response {
+        return $this->render('trip/show.html.twig', [
+           'trip' => $trip,
+        ]);
+
     }
 }

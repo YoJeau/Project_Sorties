@@ -8,10 +8,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ActionService
 {
-    public function __construct(UrlGeneratorInterface $urlGenerator)
-    {
+
+    public function __construct(UrlGeneratorInterface $urlGenerator){
         $this->urlGenerator = $urlGenerator;
     }
+
     /**
      * Détermine l'action à réaliser pour chaque voyage.
      *
@@ -57,7 +58,7 @@ class ActionService
     public function chooseAction(string $state, bool $isSubcribed, bool $isOrganisator, int $id): string
     {
         // Générer le lien "Afficher" commun à tous les états
-        $viewLink = "<a href='' class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Afficher</span></a>";
+        $viewLink = "<a href='".$this->generatePath('app_trip_show', $id)."' class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Afficher</span></a>";
 
         // Vérifier l'état pour déterminer les actions possibles
         return match ($state) {
