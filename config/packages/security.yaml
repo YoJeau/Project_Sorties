@@ -43,6 +43,7 @@ security:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
         - { path: ^/participant, roles: ROLE_USER }
+        - { path: ^/participant/import, roles: ROLE_ADMIN }
         - { path: ^/trip, roles: ROLE_USER }
 
     role_hierarchy:

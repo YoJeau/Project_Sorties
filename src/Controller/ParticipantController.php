@@ -7,6 +7,7 @@ use App\Form\ParticipantType;
 use App\Service\ImageManagerService;
 use App\Service\PasswordManagerService;
 use Doctrine\ORM\EntityManagerInterface;
+use League\Csv\Reader;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
@@ -108,5 +109,39 @@ class ParticipantController extends AbstractController
         return $this->render('participant/show.html.twig', [
             'participant' => $participant,
         ]);
+    }
+
+    #[Route('/import', name: '_import', methods: ['GET', 'POST'])]
+    public function import(
+    ): Response
+    {
+        $csv = Reader::createFromPath('participants.csv', 'r');
+        $csv->setHeaderOffset(0);
+
+        $header = $csv->getHeader();
+
+        $records = $csv->getRecords();
+
+//        dd([$records, $header]);
+
+//        $form = $this->createForm(ParticipantType::class, $participant);
+//        $form->handleRequest($request);
+//
+//        if ($form->isSubmitted() && $form->isValid()) {
+//            $participant->setPassword($passwordHasher->hashPassword($participant, 'bonjour-ENI-123'));
+//            $participant->setRoles(['ROLE_USER']);
+//            $participant->setParIsActive(true);
+//
+//            $entityManager->persist($participant);
+//            $entityManager->flush();
+//
+//
+//            return $this->redirectToRoute('app_participant_administration');
+//        }
+//
+//        return $this->render('participant/new.html.twig', [
+//            'form' => $form
+//        ]);
+        return $this->render('participant/import.html.twig', []);
     }
 }
