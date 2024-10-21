@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Participant;
 use App\Form\ParticipantType;
+use App\Repository\ParticipantRepository;
 use App\Service\ImageManagerService;
 use App\Service\PasswordManagerService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,6 +24,15 @@ class ParticipantController extends AbstractController
     public function __construct(ImageManagerService $imageManagerService, PasswordManagerService $passwordManagerService){
         $this->imageManagerService = $imageManagerService;
         $this->passwordManagerService = $passwordManagerService;
+    }
+
+    #[Route('/administration', name: '_administration', methods: ['GET'])]
+    public function administration(ParticipantRepository $participantRepository): Response
+    {
+        $participants = $participantRepository->findAll();
+        return $this->render('participant/index.html.twig', [
+            'participants' => $participants
+        ]);
     }
 
     /**
@@ -98,7 +108,7 @@ class ParticipantController extends AbstractController
      * @param Participant $participant
      * @return Response
      */
-    #[Route('/{id}', name: '_show', methods: ['GET'])]
+    #[Route('/show/{id}', name: '_show', methods: ['GET'])]
     public function show(#[CurrentUser] ?Participant $currentParticipant, Participant $participant): Response
     {
         if ($currentParticipant && $currentParticipant->getId() === $participant->getId()) {
@@ -108,5 +118,14 @@ class ParticipantController extends AbstractController
         return $this->render('participant/show.html.twig', [
             'participant' => $participant,
         ]);
+    }
+
+    #[Route('/new', name: '_new', methods: ['GET', 'POST'])]
+    public function new(
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response
+    {
+        return $this->render('participant/new.html.twig', []);
     }
 }
