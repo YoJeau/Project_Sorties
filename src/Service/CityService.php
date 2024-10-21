@@ -3,43 +3,43 @@
 namespace App\Service;
 
 use App\Entity\City;
-use App\Repository\CityRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
+use App\Repository\CityRepository;
 
 class CityService
 {
-    private $cityRepository;
     private $entityManager;
+    private $cityRepository;
 
-    public function __construct(CityRepository $cityRepository, EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, CityRepository $cityRepository)
     {
-        $this->cityRepository = $cityRepository;
         $this->entityManager = $entityManager;
+        $this->cityRepository = $cityRepository;
     }
 
-    public function findOrCreateCity(array $cityData): ?City
+    public function createOrUpdateCity(array $cityData): ?City
     {
-        if (empty($cityData['citName']) || empty($cityData['citPostCode'])) {
-            return null; // Pas assez d'informations pour traiter la ville
-        }
+        if (!empty($cityData['citName']) && !empty($cityData['citPostCode'])) {
+            // Vérifier si la ville existe déjà
+            $existingCity = $this->cityRepository->findOneBy([
+                'citName' => $cityData['citName'],
+                'citPostCode' => $cityData['citPostCode'],
+            ]);
 
-        // Chercher la ville par nom et code postal
-        $foundCity = $this->cityRepository->findOneBy([
-            'citName' => $cityData['citName'],
-            'citPostCode' => $cityData['citPostCode']
-        ]);
+            if ($existingCity) {
+                return $existingCity;  // Retourner la ville existante
+            }
 
-        // Si la ville n'existe pas, la créer
-        if ($foundCity === null) {
+            // Créer une nouvelle ville
             $city = new City();
             $city->setCitName($cityData['citName']);
             $city->setCitPostCode($cityData['citPostCode']);
 
             $this->entityManager->persist($city);
+
             return $city;
         }
 
-        return $foundCity; // Retourne la ville existante
+        return null; // Retourne null si aucune donnée valide n'est fournie
     }
 }

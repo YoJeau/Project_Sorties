@@ -62,8 +62,14 @@ class TripController extends AbstractController
 
     #[Route('/new', name: '_post', methods: ['POST'])]
     public function post(Request $request, EntityManagerInterface $entityManager, StateRepository $stateRepository, CityRepository $cityRepository, #[CurrentUser] Participant $participant) : Response {
+        $state = null;
+
         //Vérification de l'état
-       $state = $this->stateService->getStateForm($request);
+        if (isset($request->get('trip')['state'])) {
+            $state = $stateRepository->findOneBy(['staLabel' => 'Ouverte']);
+        } else {
+            $state = $stateRepository->findOneBy(['staLabel' => 'En création']);
+        }
 
         $location = new Location();
         $locationForm = $this->createForm(LocationType::class, $location);
@@ -78,25 +84,17 @@ class TripController extends AbstractController
         $tripForm->handleRequest($request);
 
         if ($tripForm->isSubmitted() && $tripForm->isValid()) {
-            if (!$this->tripService->checkDateTripForm($trip)) {
-                $this->addFlash('danger', 'La date de clôture ne peut pas être supérieur à la date de sortie.');
-                return $this->render('trip/new.html.twig', [
-                    "tripForm" => $tripForm->createView(),
-                    "locationForm" => $locationForm->createView(),
-                    "cityForm" => $cityForm->createView(),
-                ]);
-            }
             //Vérifier s'il y a des données
             // Cas : l'utilisateur ajoute un lieu et une ville dans le formulaire
-            if (!empty($request->get('location')['locName']) || !empty($request->get('location')['locStreet']) ||
-                !empty($request->get('location')['locLatitude']) || !empty($request->get('location')['locLongitude']) ||
+            if (!empty($request->get('city')['locName']) || !empty($request->get('city')['locStreet']) ||
+                !empty($request->get('city')['locLatitude']) || !empty($request->get('city')['locLongitude']) ||
                 !empty($request->get('city')['citName']) || !empty($request->get('city')['citPostCode'])
             ) {
 
                 //Vérifier la saisie de la ville, si elle existe ou pas, pour éviter de la créer en double
                 $foundCity = $cityRepository->findOneBy(
                     ['citName' => $request->get('city')['citName'],
-                    'citPostCode' => $request->get('city')['citPostCode']]
+                        'citPostCode' => $request->get('city')['citPostCode']]
                 );
 
                 if ($foundCity === null) {
@@ -119,7 +117,6 @@ class TripController extends AbstractController
             $entityManager->persist($trip);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Votre sortie a bien été créée');
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -129,6 +126,12 @@ class TripController extends AbstractController
             "cityForm" => $cityForm,
         ]);
     }
+
+
+
+
+
+
     #[Route('/update/{id}', name: '_update_get', methods: ['GET'])]
     function updateTrip(Trip $trip,#[CurrentUser] ?Participant $participant): Response {
         if(!$this->tripService->checkUpdate($trip,$participant)){
@@ -148,63 +151,75 @@ class TripController extends AbstractController
             "cityForm" => $cityForm,
         ]);
     }
+    #[Route('/update/{id}', name: '_update_post', methods: ['POST'])]
+    public function update(Trip $trip, Request $request, EntityManagerInterface $entityManager, StateRepository $stateRepository, CityRepository $cityRepository, #[CurrentUser] Participant $participant): Response
+    {
+        // Vérification de l'état
+        if (isset($request->get('trip')['state'])) {
+            $state = $stateRepository->findOneBy(['staLabel' => State::STATE_OPEN]);
+        } else {
+            $state = $stateRepository->findOneBy(['staLabel' => State::STATE_CREATED]);
+        }
 
-    #[Route('/update/{id}', name: 'app_trip_update_post', methods: ['POST'])]
-    public function updateTripPost(
-        Trip $trip,
-        Request $request,
-        EntityManagerInterface $entityManager,
-        #[CurrentUser] ?Participant $participant
-    ): Response {
-        // Créer et gérer le formulaire du voyage
-        $tripForm = $this->createForm(TripType::class, $trip);
-        $tripForm->handleRequest($request);
-
-        // Créer une nouvelle instance de Location et gérer le formulaire de localisation
-        $location = new Location();
+        $location = $trip->getTriLocation();
         $locationForm = $this->createForm(LocationType::class, $location);
         $locationForm->handleRequest($request);
 
-        // Créer une nouvelle instance de City et gérer le formulaire de ville
-        $city = new City();
+        $city = $location->getLocCity();
         $cityForm = $this->createForm(CityType::class, $city);
         $cityForm->handleRequest($request);
 
-        // Vérifier si le formulaire du voyage a été soumis et est valide
-        if ($tripForm->isSubmitted() && $tripForm->isValid()) {
-            // Récupérer les données de localisation
-            $locationData = $locationForm->getData();
+        $tripForm = $this->createForm(TripType::class, $trip);
+        $tripForm->handleRequest($request);
 
-            // Vérifiez si la localisation a changé
-            if ($this->locationService->isNewLocationDifferent(
-                $locationData->getLocName(),
-                $locationData->getLocStreet(),
-                $locationData->getLocCity(),
-                $locationData->getLocLatitude(),
-                $locationData->getLocLongitude(),
-                $trip->getTriLocation()
-            )) {
-                // Créer et persister la nouvelle localisation
-                $entityManager->persist($locationData);
-                $trip->setTriLocation($locationData);
-            } else {
-                // Si pas de changement, garder l'ancienne localisation
-                $trip->setTriLocation($trip->getTriLocation());
+            if ($tripForm->isSubmitted() && $tripForm->isValid()) {
+                // Vérifier si la ville ou la localisation a été modifiée via les sélecteurs
+                $selectedCity = $tripForm->get('triLocation')->getData()->getLocCity();
+                $selectedLocation = $tripForm->get('triLocation')->getData();
+                $cityWithiD233 = $cityRepository->findOneBy(['citName' => 'Marseille']);
+                dd($city, $selectedCity,$cityWithiD233); // Débogage pour voir les valeurs
+
+                // Vérifier si la ville a été modifiée
+                if ($selectedCity && $selectedCity->getCitId() !== $city->getCitId()) { // Comparer les IDs
+                    // Vérifier si la ville existe déjà
+                    $foundCity = $cityRepository->findOneBy([
+                        'citName' => $selectedCity->getCitName()
+                    ]);
+
+                    if ($foundCity === null) {
+                        // Créer une nouvelle ville
+                        $entityManager->persist($selectedCity);
+                        $entityManager->flush();
+                        $location->setLocCity($selectedCity);
+                    } else {
+                        // Utiliser la ville existante
+                        $location->setLocCity($foundCity);
+                    }
+                } else {
+                    // Si la ville n'a pas changé, utiliser l'ancienne ville
+                    $location->setLocCity($city); // Utiliser la ville initiale si aucun changement
+                }
+            // Vérifier si la localisation a été modifiée
+            if ($selectedLocation !== $location) {
+                $location = $selectedLocation;
+                $trip->setTriLocation($location);
+                $entityManager->persist($location);
             }
 
-            // Mettre à jour l'état et l'organisateur du voyage
-            $trip->setTriState($this->stateService->getStateForm($request));
+            $trip->setTriState($state);
             $trip->setTriOrganiser($participant);
-
-            // Persist the updated trip
             $entityManager->persist($trip);
             $entityManager->flush();
 
-            return $this->redirectWithFlash('success', 'Votre sortie a bien été mise à jour', 'app_home');
+            $this->addFlash('success', 'Votre sortie a bien été mise à jour');
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
-        // Rendu du formulaire avec les vues
-        return $this->renderTripForm($tripForm, $locationForm, $cityForm);
+        return $this->render('trip/edit.html.twig', [
+            "tripForm" => $tripForm->createView(),
+            "locationForm" => $locationForm->createView(),
+            "cityForm" => $cityForm->createView(),
+        ]);
     }
 
 

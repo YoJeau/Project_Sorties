@@ -4,86 +4,46 @@ namespace App\Service;
 use App\Entity\Location;
 use App\Entity\City;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use App\Repository\LocationRepository;
 
 class LocationService
 {
     private $entityManager;
+    private $locationRepository;
 
-    public function __construct(EntityManagerInterface $entityManager,CityService $cityService)
+    public function __construct(EntityManagerInterface $entityManager, LocationRepository $locationRepository)
     {
         $this->entityManager = $entityManager;
-        $this->cityService = $cityService;
+        $this->locationRepository = $locationRepository;
     }
 
-
-    public function handleLocation(Request $request, ?Location $existingLocation): ?Location
+    public function createOrUpdateLocation(array $locationData, City $city = null): ?Location
     {
+        // Vérification des données de localisation
+        if (!empty($locationData['locName']) || !empty($locationData['locStreet']) ||
+            !empty($locationData['locLatitude']) || !empty($locationData['locLongitude'])) {
 
-        // Récupérer les données de localisation et de ville
-        $locData = $request->get('location');
-        $cityData = $request->get('city');
-        // Vérifier si tous les champs de localisation sont remplis
-        if ($this->areLocationFieldsEmpty($locData)) {
-            return $existingLocation; // Indique que l'opération a échoué
-        }
-        // Vérifier la ville (ou la créer si nécessaire)
-        $foundCity = $this->cityService->findOrCreateCity($cityData);
+            $location = new Location();
+            $location->setLocName($locationData['locName']);
+            $location->setLocStreet($locationData['locStreet']);
+            $location->setLocLatitude($locationData['locLatitude']);
+            $location->setLocLongitude($locationData['locLongitude']);
 
-        // Si une localisation existe déjà, on l'utilise
-        $location = $existingLocation ?? new Location();
+            if ($city) {
+                $location->setLocCity($city);
+            }
 
-        // Mettre à jour les données de la localisation
-        $this->updateLocationFields($location, $locData);
+            $this->entityManager->persist($location);
 
-        // Assigner la ville à la localisation
-        if ($foundCity) {
-            $location->setLocCity($foundCity);
+            return $location;
         }
 
-        // Persist the location
-        $this->entityManager->persist($location);
-
-        return $location;
+        return null;  // Retourne null si aucune donnée valide n'est fournie
     }
 
-    /**
-     * Vérifie si tous les champs de localisation sont vides.
-     */
-    private function areLocationFieldsEmpty(array $locData): bool
+    public function getExistingLocation($locationId): ?Location
     {
-        return empty($locData['locName']) || empty($locData['locStreet']) ||
-            empty($locData['locLatitude']) || empty($locData['locLongitude']);
+        return $this->locationRepository->find($locationId);
     }
-
-    /**
-     * Met à jour les champs de la localisation.
-     */
-    private function updateLocationFields(Location $location, array $locData): void
-    {
-        if (!empty($locData['locName'])) {
-            $location->setLocName($locData['locName']);
-        }
-        if (!empty($locData['locStreet'])) {
-            $location->setLocStreet($locData['locStreet']);
-        }
-        if (!empty($locData['locLatitude'])) {
-            $location->setLocLatitude((float)$locData['locLatitude']);
-        }
-        if (!empty($locData['locLongitude'])) {
-            $location->setLocLongitude((float)$locData['locLongitude']);
-        }
-    }
-
-    public function isNewLocationDifferent(Location $existingLocation, string $locName, string $locStreet, string $locCity, string $locLatitude, string $locLongitude): bool {
-        return (
-            $existingLocation->getLocName() !== $locName ||
-            $existingLocation->getLocStreet() !== $locStreet ||
-            $existingLocation->getLocCity() !== $locCity ||
-            $existingLocation->getLocLatitude() !== $locLatitude ||
-            $existingLocation->getLocLongitude() !== $locLongitude
-        );
-    }
-
 }
+
