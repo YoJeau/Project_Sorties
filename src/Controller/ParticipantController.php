@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
@@ -123,9 +124,29 @@ class ParticipantController extends AbstractController
     #[Route('/new', name: '_new', methods: ['GET', 'POST'])]
     public function new(
         Request $request,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        UserPasswordHasherInterface $passwordHasher
     ): Response
     {
-        return $this->render('participant/new.html.twig', []);
+        $participant = new Participant();
+
+        $form = $this->createForm(ParticipantType::class, $participant);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $participant->setPassword($passwordHasher->hashPassword($participant, 'bonjour-ENI-123'));
+            $participant->setRoles(['ROLE_USER']);
+            $participant->setParIsActive(true);
+
+            $entityManager->persist($participant);
+            $entityManager->flush();
+
+
+            return $this->redirectToRoute('app_participant_administration');
+        }
+
+        return $this->render('participant/new.html.twig', [
+            'form' => $form
+        ]);
     }
 }
