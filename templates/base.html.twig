@@ -11,7 +11,7 @@
     </head>
     <body>
         <div class="container-fluid">
-           <header class="row">
+           <header class="row z-3">
                {% include "_parts/_nav.html.twig" %}
            </header>
             <main class="row">
@@ -20,7 +20,7 @@
                     {% block body %}{% endblock %}
                 </div>
             </main>
-            <footer class="row bg-primary">
+            <footer class="row bg-primary z-3">
                 {% include "_parts/_footer.html.twig" %}
             </footer>
         </div>
