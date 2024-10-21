@@ -176,7 +176,7 @@ class TripController extends AbstractController
                 // Vérifier si la ville ou la localisation a été modifiée via les sélecteurs
                 $selectedCity = $tripForm->get('triLocation')->getData()->getLocCity();
                 $selectedLocation = $tripForm->get('triLocation')->getData();
-                $cityWithiD233 = $cityRepository->findOneBy(['citName' => 'Marseille']);
+                $cityWithiD233 = $cityRepository->findOneBy(['citId' => 246]);
                 dd($city, $selectedCity,$cityWithiD233); // Débogage pour voir les valeurs
 
                 // Vérifier si la ville a été modifiée
