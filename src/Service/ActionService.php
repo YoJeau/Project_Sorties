@@ -11,6 +11,7 @@ class ActionService
     public function __construct(UrlGeneratorInterface $urlGenerator){
         $this->urlGenerator = $urlGenerator;
     }
+
     /**
      * Détermine l'action à réaliser pour chaque voyage.
      *
