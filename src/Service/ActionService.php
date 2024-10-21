@@ -55,7 +55,7 @@ class ActionService
     public function chooseAction($state, $isSubcribed, $isOrganisator, $id)
     {
         // Générer le lien "Afficher" commun à tous les états
-        $viewLink = "<a href='' class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Afficher</span></a>";
+        $viewLink = "<a href='".$this->generatePath('app_trip_show', $id)."' class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Afficher</span></a>";
 
         // Vérifier l'état pour déterminer les actions possibles
         switch ($state) {
