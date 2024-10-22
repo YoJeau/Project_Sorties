@@ -25,3 +25,15 @@ footer {
 .mobile-home {
     height: 80vh;
 }
+
+@media (min-width: 992px) {
+    .w-media-1 {
+        width: 25% !important;
+    }
+}
+
+@media (max-width: 991px) {
+    .w-media-1 {
+        width: 75% !important;
+    }
+}
