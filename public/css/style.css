@@ -25,9 +25,3 @@ footer {
 .mobile-home {
     height: 80vh;
 }
-
-.table-header-fixed {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
