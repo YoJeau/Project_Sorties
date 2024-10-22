@@ -2,8 +2,8 @@
 
 {% block body %}
 <div>
-    <h1 class="text-center mt-3">Afficher une sortie</h1>
-    <div class="d-flex flex-row gap-5 mt-5">
+    <h1 class="text-center mt-3 d-none d-lg-block">Afficher une sortie</h1>
+    <div class="d-flex flex-row gap-5 mt-5 d-none d-lg-block">
         <div class="w-50 d-flex flex-row gap-3 justify-content-end">
             <div>
                 <p>Nom de la sortie : </p>
@@ -41,6 +41,56 @@
                 <p>{{ trip.triLocation.locLatitude }}</p>
                 <p>{{ trip.triLocation.locLongitude }}</p>
             </div>
+        </div>
+    </div>
+    <div class="d-flex flex-row d-lg-none pt-media-1">
+        <div>
+            <p>Nom : </p>
+            <p>{{ trip.triName }}</p>
+        </div>
+        <div>
+            <p>Date et heure : </p>
+            <p>{{ trip.triStartingDate|date("d/m/Y H:i") }}</p>
+        </div>
+        <div>
+            <p>Ville : </p>
+            <p>{{ trip.triLocation.locCity.citName }}</p>
+        </div>
+        <div>
+            <p>Lieu : </p>
+            <p>{{ trip.triLocation.locName }}</p>
+        </div>
+        <div>
+            <p>Rue : </p>
+            <p>{{ trip.triLocation.locStreet }}</p>
+        </div>
+        <div>
+            <p>Code postal : </p>
+            <p>{{ trip.triLocation.locCity.citPostCode }}</p>
+        </div>
+        <div>
+            <p>Latitude : </p>
+            <p>{{ trip.triLocation.locLatitude }}</p>
+        </div>
+        <div>
+            <p>Longitude : </p>
+            <p>{{ trip.triLocation.locLongitude }}</p>
+        </div>
+        <div>
+            <p>Clôture : </p>
+            <p>{{  }}</p>
+        </div>
+        <div>
+            <p>Nombre de places : </p>
+            <p>{{  }}</p>
+        </div>
+        <div>
+            <p>Durée : </p>
+            <p>{{  }}</p>
+        </div>
+        <div>
+            <p>Description et infos : </p>
+            <p>{{  }}</p>
         </div>
     </div>
     <div class="d-flex justify-content-center mt-5">

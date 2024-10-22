@@ -37,3 +37,15 @@ footer {
         width: 75% !important;
     }
 }
+
+@media (min-width: 576px) and (max-width: 991px) {
+    .pt-media-1 {
+        padding-top: 5% !important;
+    }
+}
+
+@media (max-width: 575px) {
+    .pt-media-1 {
+        padding-top: 3% !important;
+    }
+}
