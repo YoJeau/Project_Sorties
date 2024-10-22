@@ -50,7 +50,7 @@ class ActionService
         return $row->getTriOrganiser()->getId() == $user->getId();
     }
 
-    public function generatePath($nameRoute, $param)
+    public function generatePath($nameRoute, $param): string
     {
         return $this->urlGenerator->generate($nameRoute, ['id' => $param], UrlGeneratorInterface::ABSOLUTE_PATH);
     }
@@ -70,7 +70,7 @@ class ActionService
         };
     }
 
-    private function getOpenStateActions(bool  $isSubcribed, bool $isOrganisator, int $id, string $viewLink): string
+    private function getOpenStateActions(bool $isSubcribed, bool $isOrganisator, int $id, string $viewLink): string
     {
         if ($isSubcribed) {
             // Utilisateur inscrit
@@ -86,7 +86,7 @@ class ActionService
         return $viewLink;
     }
 
-    private function getClosedStateActions(bool  $isSubcribed, int $id, string $viewLink): string
+    private function getClosedStateActions(bool $isSubcribed, int $id, string $viewLink): string
     {
         if ($isSubcribed) {
             // Inscrit à un événement fermé

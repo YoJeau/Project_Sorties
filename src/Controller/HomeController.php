@@ -2,28 +2,25 @@
 
 namespace App\Controller;
 
-use App\Entity\Site;
 use App\Entity\State;
 use App\Repository\SiteRepository;
 use App\Repository\TripRepository;
 use App\Service\ActionService;
-use App\Service\CheckStateService;
+use App\Service\StateService;
 use App\Service\FilterService;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class HomeController extends AbstractController
 {
     public function __construct(
         SiteRepository $siteRepository,
         TripRepository $tripRepository,
-        ActionService $actionService,
-        CheckStateService $checkStateService,
+        ActionService  $actionService,
+        StateService   $checkStateService,
     ){
         $this->siteRepository = $siteRepository;
         $this->tripRepository = $tripRepository;
