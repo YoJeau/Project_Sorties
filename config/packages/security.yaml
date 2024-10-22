@@ -46,6 +46,7 @@ security:
         - { path: ^/participant/show, roles: ROLE_USER }
         - { path: ^/participant/administration, roles: ROLE_ADMIN }
         - { path: ^/participant/new, roles: ROLE_ADMIN }
+        - { path: ^/participant/import, roles: ROLE_ADMIN }
         - { path: ^/trip, roles: ROLE_USER }
 
     role_hierarchy:

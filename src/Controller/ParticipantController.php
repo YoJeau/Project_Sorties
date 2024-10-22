@@ -3,12 +3,17 @@
 namespace App\Controller;
 
 use App\Entity\Participant;
+use App\Form\CSVUploadType;
 use App\Form\ParticipantType;
 use App\Repository\ParticipantRepository;
 use App\Service\ImageManagerService;
+use App\Service\ParticipantService;
 use App\Service\PasswordManagerService;
 use Doctrine\ORM\EntityManagerInterface;
+use League\Csv\Exception;
+use League\Csv\UnavailableStream;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,7 +43,7 @@ class ParticipantController extends AbstractController
     public function administration(ParticipantRepository $participantRepository): Response
     {
         $participants = $participantRepository->findAll();
-        return $this->render('participant/index.html.twig', [
+        return $this->render('participant/administration.html.twig', [
             'participants' => $participants
         ]);
     }
@@ -140,7 +145,8 @@ class ParticipantController extends AbstractController
     public function new(
         Request $request,
         EntityManagerInterface $entityManager,
-        UserPasswordHasherInterface $passwordHasher
+        UserPasswordHasherInterface $passwordHasher,
+        ParameterBagInterface $parameterBag
     ): Response
     {
         $participant = new Participant();
@@ -149,19 +155,59 @@ class ParticipantController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $participant->setPassword($passwordHasher->hashPassword($participant, 'bonjour-ENI-123'));
+            $password = $parameterBag->get('default_pwd');
+            $participant->setPassword($passwordHasher->hashPassword($participant, $password));
             $participant->setRoles(['ROLE_USER']);
             $participant->setParIsActive(true);
 
             $entityManager->persist($participant);
             $entityManager->flush();
 
-
             return $this->redirectToRoute('app_participant_administration');
         }
 
         return $this->render('participant/new.html.twig', [
             'form' => $form
+        ]);
+    }
+
+    /**
+     * Import participants from a CSV file.
+     *
+     * @param Request $request
+     * @param ParticipantService $participantService
+     * @return Response
+     */
+    #[Route('/import', name: '_import', methods: ['GET', 'POST'])]
+    public function import(Request $request, ParticipantService $participantService): Response
+    {
+        $form = $this->createForm(CSVUploadType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $csvFile = $form->get('csvFile')->getData();
+
+            if (empty($csvFile)) {
+                $this->addFlash('danger', 'Erreur lors de l\'envoie du fichier CSV.');
+
+                return $this->redirectToRoute('app_participant_import');
+            }
+
+            $filePath = $csvFile->getPathname();
+
+            try {
+                $participantService->getParticipantsFromCSV($filePath);
+            } catch (UnavailableStream|Exception $e) {
+                $this->addFlash('danger', 'Erreur lors de la lecture du fichier CSV.');
+            }
+
+            $this->addFlash('success', 'Les participants sont bien créés.');
+
+            return $this->redirectToRoute('app_participant_administration');
+        }
+
+        return $this->render('participant/import.html.twig', [
+            'form' => $form->createView()
         ]);
     }
 }
