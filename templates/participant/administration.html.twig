@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des participants{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-center p-3">
+        <h1>Administration des participants</h1>
+    </div>
+
+    <div class="d-flex justify-content-center gap-5 p-3">
+        <a href="{{ path('app_participant_new') }}"><button type="button" class="btn btn-primary">Créer un nouveau participant</button></a>
+        <a href="{{ path('app_participant_import') }}"><button type="button" class="btn btn-primary">Importer depuis un fichier CSV</button></a>
+    </div>
+
+    <div class="d-flex flew-row justify-content-center p-3">
+        <table class="table table-hover w-75">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Pseudo</th>
+                    <th scope="col">Prénom</th>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Téléphone</th>
+                    <th scope="col">E-mail</th>
+                    <th scope="col">Site</th>
+                    <th scope="col">Actif</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for participant in participants %}
+                    <tr class="table-dark">
+                        <td>{{ participant.id }}</td>
+                        <td>{{ participant.parUsername }}</td>
+                        <td>{{ participant.parFirstName }}</td>
+                        <td>{{ participant.parLastName }}</td>
+                        <td>{{ participant.parPhone }}</td>
+                        <td>{{ participant.parEmail }}</td>
+                        <td>{{ participant.parSite.sitName }}</td>
+                        <td class="{{ participant.parIsActive ? 'table-success' : 'table-danger' }}">{{ participant.parIsActive ? 'oui' : 'non' }}</td>
+                        <td>actions ?</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

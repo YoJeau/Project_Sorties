@@ -1,0 +1,78 @@
+{%  extends 'base.html.twig' %}
+
+{% block body %}
+<div>
+    <h1 class="text-center mt-3">Afficher une sortie</h1>
+    <div class="d-flex flex-row gap-5 mt-5">
+        <div class="w-50 d-flex flex-row gap-3 justify-content-end">
+            <div>
+                <p>Nom de la sortie : </p>
+                <p>Date et heure de la sortie :</p>
+                <p>Date limite d'inscription :</p>
+                <p>Nombre de places :</p>
+                <p>Durée :</p>
+                <p>Description et infos :</p>
+            </div>
+            <div>
+                <p>{{ trip.triName}}</p>
+                <p>{{ trip.triStartingDate|date("d/m/Y H:i") }}</p>
+                <p>{{ trip.triClosingDate|date("d/m/Y H:i") }}</p>
+                <p>{{ trip.triMaxInscriptionNumber}}</p>
+                <p>{{ trip.triDuration}} minutes</p>
+                <p>{{ trip.triDescription}}</p>
+            </div>
+        </div>
+        <div class="w-50 d-flex flex-row gap-3">
+            <div>
+                <p>Site organisateur :</p>
+                <p>Ville :</p>
+                <p>Lieu :</p>
+                <p>Rue :</p>
+                <p>Code postal :</p>
+                <p>Latitude :</p>
+                <p>Longitude :</p>
+            </div>
+            <div>
+                <p>{{ trip.triSite.sitName }}</p>
+                <p>{{ trip.triLocation.locCity.citName }}</p>
+                <p>{{ trip.triLocation.locName }}</p>
+                <p>{{ trip.triLocation.locStreet }}</p>
+                <p>{{ trip.triLocation.locCity.citPostCode }}</p>
+                <p>{{ trip.triLocation.locLatitude }}</p>
+                <p>{{ trip.triLocation.locLongitude }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center mt-5">
+        <div class="w-25" >
+            {% if trip.triSubscribes|length > 0 %}
+                <p>Liste des participants inscrits :</p>
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Pseudo</th>
+                            <th>Nom</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for subscribe in trip.triSubscribes %}
+                            <tr class="table-primary">
+                                <td class="w-50">
+                                    {% if subscribe.subParticipantId.parPicture == null %}
+                                        <img src="{{ asset('img/default.png') }}" alt="Photo de profil" width="15%" height="15%"  class="rounded-circle">
+                                    {% else %}
+                                        <img src="{{ asset('img/' ~ subscribe.subParticipantId.parPicture) }}" alt="Photo de profil" width="15%" height="15%"  class="rounded-circle">
+                                    {% endif %}
+                                    {{ subscribe.subParticipantId.parUsername }}</td>
+                                <td class="w-50">{{ subscribe.subParticipantId.parFirstName }} {{ subscribe.subParticipantId.parLastName }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-center">Aucun participant inscrit.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

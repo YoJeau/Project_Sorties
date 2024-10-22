@@ -33,6 +33,7 @@ class TripController extends AbstractController
         $this->locationService = $locationService;
         $this->stateService = $stateService;
     }
+
     #[Route]
     public function index(): Response
     {
@@ -285,7 +286,8 @@ class TripController extends AbstractController
         StateRepository $stateRepository,
         #[CurrentUser] ?Participant $currentParticipant,
         int $id
-    ): Response {
+    ): Response
+    {
         $trip = $tripRepository->find($id);
 
         if (is_null($trip)) {
@@ -326,5 +328,71 @@ class TripController extends AbstractController
             'trip' => $trip,
             'form' => $form->createView()
         ]);
+    }
+
+    /**
+     * publish a trip on the trip board via its ID.
+     *
+     * @param EntityManagerInterface $entityManager
+     * @param TripRepository $tripRepository
+     * @param StateService $stateService
+     * @param Participant|null $currentParticipant
+     * @param int $id Trip id
+     * @return Response
+     */
+    #[Route('/publish/{id}', name: '_publish', methods: ['GET'])]
+    public function publish(
+        EntityManagerInterface $entityManager,
+        TripRepository $tripRepository,
+        StateService $stateService,
+        #[CurrentUser] ?Participant $currentParticipant,
+        int $id
+    ): Response
+    {
+        $trip = $tripRepository->find($id);
+
+        if (is_null($trip)) {
+            $this->addFlash('danger', "La sortie n'existe pas.");
+
+            return $this->redirectToRoute('app_home');
+        }
+
+        if ($currentParticipant && $currentParticipant->getId() !== $trip->getTriOrganiser()->getId()) {
+            $this->addFlash('danger', "Vous n'êtes pas l'organisateur de la sortie.");
+
+            return $this->redirectToRoute('app_home');
+        }
+
+        if ($trip->getTriState()->getStaLabel() !== State::STATE_CREATED) {
+            $this->addFlash('danger', "La sortie est déjà publiée.");
+
+            return $this->redirectToRoute('app_home');
+        }
+
+        try {
+            $stateService->checkTripState($trip);
+        } catch (\DateInvalidOperationException|\DateMalformedStringException $e) {
+            $this->addFlash('danger', "Date invalide.");
+
+            return $this->redirectToRoute('app_home');
+        }
+
+        $entityManager->flush();
+        $this->addFlash('success', 'La sortie a bien été publiée.');
+
+        return $this->redirectToRoute('app_home');
+    }
+
+    /**
+     * Show a trip
+     * @param Trip $trip
+     * @return Response
+     */
+    #[Route('/{id}', name: '_show')]
+    public function show(Trip $trip): Response {
+        return $this->render('trip/show.html.twig', [
+           'trip' => $trip,
+        ]);
+
     }
 }

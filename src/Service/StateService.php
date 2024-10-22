@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\State;
+use App\Entity\Trip;
 use App\Repository\StateRepository;
 use App\Repository\TripRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -10,6 +11,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 class StateService
 {
+    private TripRepository $tripRepository;
+    private StateRepository $stateRepository;
+    private EntityManagerInterface $entityManager;
+
     public function __construct(TripRepository $tripRepository, StateRepository $stateRepository, EntityManagerInterface $entityManager)
     {
         $this->tripRepository = $tripRepository;
@@ -20,47 +25,61 @@ class StateService
     /**
      * @throws \DateMalformedStringException
      */
-    public function checkState()
+    public function checkState(): void
     {
-        // Définir la zone horaire par défaut
-        $timezone = new \DateTimeZone('Europe/Paris');
-
         $trips = $this->tripRepository->findAll();
         foreach ($trips as $trip) {
-            $startDate = $trip->getTriStartingDate();
-            $endDate = $trip->getTriClosingDate();
             $state = $trip->getTriState()->getStaLabel();
-            $startDate = new \DateTimeImmutable($startDate->format('Y-m-d H:i:s'), $timezone);
-            $endDate = new \DateTimeImmutable($endDate->format('Y-m-d H:i:s'), $timezone);
-
-
 
             // Ignorer les trips en "En création", "Terminée" ou "Annulée"
-            if ($state === State::STATE_CREATED || $state === State::STATE_CANCELLED || $state === State::STATE_ARCHIVED) {
-                continue;
+            if (
+                $state !== State::STATE_CREATED
+                &&
+                $state !== State::STATE_CANCELLED
+                &&
+                $state !== State::STATE_ARCHIVED
+            ) {
+                $this->checkTripState($trip);
             }
-
-            // Vérifications d'état
-
-            $this->checkOpenState($trip,$startDate, $timezone);
-            $this->checkInProgressState($trip, $startDate, $timezone);
-            $this->checkedClosedState($trip, $startDate, $endDate, $timezone);
-            $this->checkedArchiveTrip($trip,$startDate,$timezone);
         }
         $this->entityManager->flush();
     }
 
     /**
+     * checks the state of the trip in parameter.
+     *
+     * @param Trip $trip
+     * @return void
+     * @throws \DateInvalidOperationException
      * @throws \DateMalformedStringException
      */
-    public function checkInProgressState($trip, $startDate, $timezone)
+    public function checkTripState(Trip $trip): void
+    {
+        // sets the default time zone
+        $timezone = new \DateTimeZone('Europe/Paris');
+
+        $startDate = $trip->getTriStartingDate();
+        $endDate = $trip->getTriClosingDate();
+        $startDate = new \DateTimeImmutable($startDate->format('Y-m-d H:i:s'), $timezone);
+        $endDate = new \DateTimeImmutable($endDate->format('Y-m-d H:i:s'), $timezone);
+
+        // status checks
+        $this->checkOpenState($trip,$startDate, $timezone);
+        $this->checkInProgressState($trip, $startDate, $timezone);
+        $this->checkedClosedState($trip, $startDate, $endDate, $timezone);
+        $this->checkedArchiveTrip($trip,$startDate,$timezone);
+    }
+
+    /**
+     * @throws \DateMalformedStringException
+     */
+    public function checkInProgressState($trip, $startDate, $timezone): void
     {
         // Créer une date actuelle avec le fuseau horaire Europe/Paris
         $currentDate = new \DateTimeImmutable('now', $timezone);
         // Récupérer la durée du trip en minutes
         $duration = $trip->getTriDuration(); // Durée en minutes
         $endDate = $startDate->modify("+{$duration} minutes");
-
 
         if ($currentDate >= $startDate && $currentDate <= $endDate) {
             $this->updateTripState($trip, State::STATE_IN_PROGRESS);
@@ -72,8 +91,7 @@ class StateService
         }
     }
 
-
-    public function checkOpenState($trip, $startDate, $timezone)
+    public function checkOpenState($trip, $startDate, $timezone): void
     {
         $maxSubcribe = $trip->getTriMaxInscriptionNumber();
         $subscribes = count($trip->getTriSubscribes());
@@ -88,7 +106,7 @@ class StateService
         }
     }
 
-    public function checkedClosedState($trip, $startDate, $endDate, $timezone)
+    public function checkedClosedState($trip, $startDate, $endDate, $timezone): void
     {
         $currentDate = new \DateTimeImmutable('now', $timezone);
         if ($currentDate > $endDate && $currentDate < $startDate) {
@@ -100,7 +118,8 @@ class StateService
      * @throws \DateMalformedStringException
      * @throws \DateInvalidOperationException
      */
-    public function checkedArchiveTrip($trip, $startDate, $timezone){
+    public function checkedArchiveTrip($trip, $startDate, $timezone): void
+    {
         $currentDate = new \DateTimeImmutable('now', $timezone);
         $month = new \DateInterval('P1M');
         $limitDate = $currentDate->sub($month);
@@ -124,7 +143,7 @@ class StateService
         return $this->stateRepository->findOneBy(['staLabel' => $stateLabel]);
     }
 
-    private function updateTripState($trip, $newStateLabel)
+    private function updateTripState($trip, $newStateLabel): void
     {
         $newState = $this->stateRepository->findOneBy(['staLabel' => $newStateLabel]);
         if ($newState) {
