@@ -3,23 +3,62 @@
 {% block title %}{{ parent() }}-Accueil{% endblock %}
 
 {% block body %}
-    <div class="lead container d-flex flex-column align-items-end mt-2">
-        <p>Date du jour : {{ "now"|date("d/m/Y") }}</p>
-        {% if app.user %}
-            <p>Participant : {{ app.user.parFirstName }} {{ app.user.parLastName }}</p>
+    <div class="d-none d-sm-block">
+        <div class="lead container d-flex flex-column align-items-end mt-2">
+            <p>Date du jour : {{ "now"|date("d/m/Y") }}</p>
+            {% if app.user %}
+                <p>Participant : {{ app.user.parFirstName }} {{ app.user.parLastName }}</p>
+            {% endif %}
+        </div>
+        <div class="container">
+            <h2 class="mb-4">Filtrer les sorties</h2>
+            {%  include 'home/_filter.html.twig' %}
+        </div>
+        <div class="mt-5">
+            {% include 'home/_trip_list.html.twig' %}
+        </div>
+        <div class="d-flex justify-content-center">
+            <a href="{{ path('app_trip_new') }}" class="btn btn-primary">
+                Créer une sortie
+            </a>
+        </div>
+    </div>
+    <div class="d-flex flex-column d-sm-none gap-3 p-3 mobile-home">
+        <div>
+            <h1>Mes sorties</h1>
+        </div>
+        {% if trips|length > 0 %}
+            <div class="overflow-y-auto">
+                <table class="table table-sm">
+                    <thead class="table-primary table-header-fixed">
+                        <tr>
+                            <th scope="col">
+                                Nom de la sortie
+                            </th>
+                            <th scope="col">
+                                Date de la sortie
+                            </th>
+                            <th scope="col">
+                                Lieu
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for trip in trips %}
+                            <tr class="{{ loop.index is even ? 'table-dark' : '' }}">
+                                <td><a href="{{ path('app_trip_show', {'id': trip.id }) }}">{{ trip.triName }}</a></td>
+                                <td>{{ trip.triStartingDate|date("d/m/Y H:i") }}</td>
+                                <td>{{ trip.triLocation.locName }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div>
+                <p>Aucune sortie</p>
+            </div>
         {% endif %}
-    </div>
-    <div class="container">
-        <h2 class="mb-4">Filtrer les sorties</h2>
-        {%  include 'home/_filter.html.twig' %}
-    </div>
-    <div class="mt-5">
-        {% include 'home/_trip_list.html.twig' %}
-    </div>
-    <div class="d-flex justify-content-center">
-        <a href="{{ path('app_trip_new') }}" class="btn btn-primary">
-            Créer une sortie
-        </a>
     </div>
 {% endblock %}
 
