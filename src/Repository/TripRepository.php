@@ -14,24 +14,21 @@ class TripRepository extends ServiceEntityRepository
         parent::__construct($registry, Trip::class);
     }
 
-    public function findNonArchivedTrips(){
+    public function findNonArchivedTrips()
+    {
         return $this->createQueryBuilder('t')
-            ->join('t.triState','s')
+            ->join('t.triState', 's')
             ->where('s.staLabel != :state')
-            ->setParameter('state',State::STATE_ARCHIVED)
+            ->setParameter('state', State::STATE_ARCHIVED)
             ->getQuery()
             ->getResult();
     }
+
     public function getFilteredTrips($filters, $user)
     {
         $qb = $this->createQueryBuilder('t');
         $qb->join('t.triState', 's');
         $this->applyOrganizerAndSubscriptionFilters($qb, $filters, $user);
-
-        if ($filters['ancientTrip'] === true) {
-            $qb->orWhere('t.triStartingDate < :now')
-                ->setParameter('now', new \DateTime());
-        }
 
         $this->applyNameFilter($qb, $filters);
         $this->applyDateFilters($qb, $filters);
@@ -73,40 +70,84 @@ class TripRepository extends ServiceEntityRepository
 
     private function applyOrganizerAndSubscriptionFilters($qb, $filters, $user): void
     {
+        // Paramètre pour la date actuelle
+        $now = new \DateTime();
 
-        if ($filters['subcribeTrip'] === true && $filters['notSubcribeTrip'] === true) {
-            $qb->getQuery()->getResult();
+        // Cas 1 : Tous les filtres sont vrais (on retourne tous les résultats)
+        if ($filters['organisatorTrip'] && $filters['subcribeTrip'] && $filters['notSubcribeTrip'] && $filters['ancientTrip']) {
+            return; // Retourner tous les résultats, pas besoin d'ajouter de conditions
+        }
+
+        // Cas 2 : Organisateur + Inscrit + Pas Inscrit
+        if ($filters['organisatorTrip'] && $filters['subcribeTrip'] && $filters['notSubcribeTrip']) {
+            $qb->orWhere('t.triOrganiser = :user')
+                ->leftJoin('t.triSubscribes', 'subInscrit')
+                ->orWhere('subInscrit.subParticipantId = :user')
+                ->orWhere('subInscrit.subParticipantId IS NULL');
+            $qb->setParameter('user', $user);
             return;
         }
 
-        // Filtrer les voyages organisés par l'utilisateur
-        if ($filters['organisatorTrip'] === true) {
+        // Cas 3 : Organisateur + Inscrit
+        if ($filters['organisatorTrip'] && $filters['subcribeTrip']) {
             $qb->orWhere('t.triOrganiser = :user')
-                ->setParameter('user', $user);
+                ->leftJoin('t.triSubscribes', 'subInscrit')
+                ->orWhere('subInscrit.subParticipantId = :user');
+            $qb->setParameter('user', $user);
+            return;
         }
 
-        // Voyages auxquels l'utilisateur est inscrit
-        if ($filters['subcribeTrip'] === true) {
-            $qb->join('t.triSubscribes', 's1')
-                ->orWhere('s1.subParticipantId = :user')
-                ->setParameter('user', $user);
+        // Cas 4 : Organisateur + Pas Inscrit
+        if ($filters['organisatorTrip'] && $filters['notSubcribeTrip']) {
+            $qb->andWhere('t.triOrganiser = :user')
+                ->leftJoin('t.triSubscribes', 'notInscrit', 'WITH', 'notInscrit.subParticipantId = :user')
+                ->orWhere('notInscrit.subParticipantId IS NULL');
+            $qb->setParameter('user', $user);
+            return;
         }
 
-        // Voyages auxquels l'utilisateur n'est pas inscrit et n'est pas l'organisateur
-        if ($filters['notSubcribeTrip'] === true) {
-            // Effectuer une jointure gauche pour vérifier les abonnements
-            $qb->leftJoin('t.triSubscribes', 's2', 'WITH', 's2.subParticipantId = :user')
-                ->orWhere('s2.subParticipantId IS NULL');
+        // Cas 5 : Inscrit + Pas Inscrit
+        if ($filters['subcribeTrip'] && $filters['notSubcribeTrip']) {
+            $qb->leftJoin('t.triSubscribes', 'notInscrit1', 'WITH', 'notInscrit1.subParticipantId = :user')
+                ->orWhere('notInscrit1.subParticipantId IS NULL')
+                ->orWhere('notInscrit1.subParticipantId = :user')
+                ->andWhere('t.triOrganiser != :user');
+            $qb->setParameter('user', $user);
+            return;
+        }
 
-            // Si l'utilisateur est un organisateur, on ne filtre pas par organisateur
-            if ($filters['organisatorTrip'] === true) {
-                // Pas de condition andWhere sur l'organisateur
-                $qb->setParameter('user', $user);
-            } else {
-                // Si pas organisateur, alors on filtre pour ne pas inclure les voyages organisés par l'utilisateur
-                $qb->andWhere('t.triOrganiser != :user')
-                    ->setParameter('user', $user);
+        // Cas 6 : Pas inscrit
+        if ($filters['notSubcribeTrip']) {
+            $qb->leftJoin('t.triSubscribes', 'notInscrit', 'WITH', 'notInscrit.subParticipantId = :user')
+                ->orWhere('notInscrit.subParticipantId IS NULL');
+
+            if (!$filters['organisatorTrip']) {
+                $qb->andWhere('t.triOrganiser != :user');
             }
+            $qb->setParameter('user', $user);
+            return;
+        }
+
+        // Cas 7 : Ancien
+        if ($filters['ancientTrip']) {
+            $qb->orWhere('t.triStartingDate < :now')
+                ->setParameter('now', $now);
+            return;
+        }
+
+        // Cas 8 : Organisateur
+        if ($filters['organisatorTrip']) {
+            $qb->andWhere('t.triOrganiser = :user');
+            $qb->setParameter('user', $user);
+            return;
+        }
+
+        // Cas 9 : Inscrit
+        if ($filters['subcribeTrip']) {
+            $qb->join('t.triSubscribes', 'subInscrit')
+                ->orWhere('subInscrit.subParticipantId = :user');
+            $qb->setParameter('user', $user);
+            return;
         }
     }
 }
