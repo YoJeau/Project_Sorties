@@ -42,16 +42,16 @@ class SiteController extends AbstractController
         ]);
     }
 
-    #[Route('/site/edit/{id}', name:'app_site_edit')]
+    #[Route('/site/edit/{id}', name:'app_site_edit', methods: ['POST'])]
     public function edit(Site $site, Request $request, EntityManagerInterface $entityManager) : Response {
+
         $form = $this->createForm(SiteType::class, $site);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-
+        if ($form->isSubmitted() && $this->isCsrfTokenValid('edit'.$site->getId(), $request->getPayload()->getString('_token'))) {
+            $site->setSitName($request->get('site')['sitName']);
             $entityManager->flush();
         }
-
 
         return $this->redirectToRoute('app_site');
     }

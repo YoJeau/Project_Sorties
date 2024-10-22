@@ -1,35 +1,44 @@
-<div class="d-flex justify-content-center mt-5">
-    <table class="table table-hover w-25">
-        <thead class="table-dark">
-            <th>Villes</th>
-            <th>Actions</th>
-        </thead>
-        <tbody>
-            {% for site in sites %}
-                <tr>
-                    <td class="w-50">
-                        <form id="site-{{ site.id }}" action="{{ path('app_site_edit', {'id' : site.id}) }}" method="post">
-                            <label for="{{ site.id }}" hidden>Modifier</label>
-                            <input class="form-control" type="text" name="{{ site.id }}" id="{{ site.id }}" value="{{ site.sitName }}" />
-                        </form>
-                    </td>
-
-                    <td class="d-flex flex-row">
-                        <button type="submit" form="site-{{ site.id }}" class="btn btn-primary">Modifier</button>
-
-                        <form action="{{ path('app_site_delete', {'id': site.id}) }}" method="post">
-                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ site.id) }}">
-                            <button class="btn">Supprimer</button>
-                        </form>
-                    </td>
+<div class="container-fluid d-flex flex-column justify-content-center mt-3 w-50">
+        <table class="table table-hover" id="siteDatatable">
+            <thead class="border border-primary">
+                <tr class="table-primary">
+                    <th>Villes</th>
+                    <th>Actions</th>
                 </tr>
-            {% endfor %}
-                <tr>
-                    {{ form_start(siteForm) }}
-                        <td class="w-50">{{ form_widget(siteForm) }}</td>
-                        <td><button type="submit" class="btn btn-success">Ajouter</button></td>
-                    {{ form_end(siteForm) }}
-                </tr>
-        </tbody>
-    </table>
+            </thead>
+
+            <tbody>
+                {% for site in sites %}
+                    <tr class="border-bottom" data-city-id="{{ site.id }}">
+                        <td>
+                            <form id="site-{{ site.id }}" action="{{ path('app_site_edit', {'id' : site.id}) }}" method="post">
+                                <label for="{{ field_name(siteForm.sitName) }}" hidden>{{ site.sitName }}</label>
+                                <input type="hidden" name="_token" value="{{ csrf_token('edit' ~ site.id) }}">
+                                <input type="text"
+                                       class="form-control"
+                                       id="{{ field_name(siteForm.sitName) }}"
+                                       name="{{ field_name(siteForm.sitName) }}"
+                                       value="{{ site.sitName }}"
+                                       required
+                                >
+                                {{ form_errors(siteForm) }}
+                            </form>
+                        </td>
+
+                        <td class="d-flex flex-row justify-content-center gap-3">
+                            <button type="submit" form="site-{{ site.id }}" class="btn btn-primary">Modifier</button>
+
+                            {% if site.sitParticipants|length == 0 %}
+                                <form action="{{ path('app_site_delete', {'id': site.id}) }}" method="post">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ site.id) }}">
+                                    <button class="btn btn-danger">Supprimer</button>
+                                </form>
+                            {% else %}
+                                <button type="button" class="btn btn-danger disabled" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Suppression impossible : des participants sont rattachés à ce site.">Supprimer</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 </div>

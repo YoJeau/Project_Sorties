@@ -14,7 +14,7 @@ class SiteType extends AbstractType
     {
         $builder
             ->add('sitName', TextType::class, [
-                    'label' => false
+                    'label' => 'Site'
             ])
         ;
     }
