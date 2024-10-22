@@ -237,11 +237,7 @@ class TripController extends AbstractController
 
         try {
             $checkStateService->checkTripState($trip);
-        } catch (\DateInvalidOperationException $e) {
-            $this->addFlash('danger', "Date invalide.");
-
-            return $this->redirectToRoute('app_home');
-        } catch (\DateMalformedStringException $e) {
+        } catch (\DateInvalidOperationException|\DateMalformedStringException $e) {
             $this->addFlash('danger', "Date invalide.");
 
             return $this->redirectToRoute('app_home');
