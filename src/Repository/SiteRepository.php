@@ -16,6 +16,16 @@ class SiteRepository extends ServiceEntityRepository
         parent::__construct($registry, Site::class);
     }
 
+    public function searchBySite(string $keyword) : array {
+        $em = $this->getEntityManager();
+        $dql = "SELECT s
+            FROM App\Entity\Site s
+            WHERE s.sitName LIKE :keyword";
+        $query = $em->createQuery($dql);
+        $query->setParameter('keyword', '%'.$keyword.'%');
+        return $query->getResult();
+    }
+
     //    /**
     //     * @return Site[] Returns an array of Site objects
     //     */

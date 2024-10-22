@@ -1,0 +1,35 @@
+<div class="d-flex justify-content-center mt-5">
+    <table class="table table-hover w-25">
+        <thead class="table-dark">
+            <th>Villes</th>
+            <th>Actions</th>
+        </thead>
+        <tbody>
+            {% for site in sites %}
+                <tr>
+                    <td class="w-50">
+                        <form id="site-{{ site.id }}" action="{{ path('app_site_edit', {'id' : site.id}) }}" method="post">
+                            <label for="{{ site.id }}" hidden>Modifier</label>
+                            <input class="form-control" type="text" name="{{ site.id }}" id="{{ site.id }}" value="{{ site.sitName }}" />
+                        </form>
+                    </td>
+
+                    <td class="d-flex flex-row">
+                        <button type="submit" form="site-{{ site.id }}" class="btn btn-primary">Modifier</button>
+
+                        <form action="{{ path('app_site_delete', {'id': site.id}) }}" method="post">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ site.id) }}">
+                            <button class="btn">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+                <tr>
+                    {{ form_start(siteForm) }}
+                        <td class="w-50">{{ form_widget(siteForm) }}</td>
+                        <td><button type="submit" class="btn btn-success">Ajouter</button></td>
+                    {{ form_end(siteForm) }}
+                </tr>
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Les sites{% endblock %}
+
+{% block body %}
+<div>
+    <h1 class="text-center"> Gérer les sites</h1>
+    {% include 'site/_filter.html.twig' %}
+    {% include 'site/show.html.twig' %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset("js/site.js") }}"></script>
+{% endblock %}
