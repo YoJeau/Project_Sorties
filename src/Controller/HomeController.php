@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Participant;
 use App\Entity\State;
 use App\Repository\SiteRepository;
 use App\Repository\TripRepository;
@@ -13,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class HomeController extends AbstractController
 {
@@ -32,9 +34,19 @@ class HomeController extends AbstractController
      * @throws \DateMalformedStringException
      */
     #[Route('/', name: 'app_home', methods: ['GET', 'POST'])]
-    public function index(Request $request, PaginatorInterface $paginator, FilterService $filterService): Response
+    public function index(Request $request, PaginatorInterface $paginator, FilterService $filterService, #[CurrentUser] ?Participant $participant): Response
     {
-        if (!$this->getUser()) return $this->redirectToRoute('app_login');
+        if (is_null($participant)) return $this->redirectToRoute('app_login');
+
+        // lists user outputs for mobile display
+        $participantTrips = [];
+        foreach ($participant->getParCreatedTrips() as $trip) {
+            $participantTrips[] = $trip;
+        }
+        foreach ($participant->getParSubscribes() as $subscribes) {
+            $participantTrips[] = $subscribes->getSubTripId();
+        }
+
 
         $sites = $this->siteRepository->findAll();
         $filters = [];
@@ -60,7 +72,7 @@ class HomeController extends AbstractController
             $trips = $this->tripRepository->findNonArchivedTrips();
             $trips = $paginator->paginate($trips, $request->query->getInt('page', 1), 10);
         }
-        $actions = $this->actionService->determineAction($this->getUser(), $trips);
+        $actions = $this->actionService->determineAction($participant, $trips);
         $stateColors = [
             State::STATE_COMPLETED => "table-dark",
             State::STATE_OPEN => "table-light",
@@ -77,6 +89,7 @@ class HomeController extends AbstractController
             'actions' => $actions,
             'filters' => $filters,
             'stateColors' => $stateColors,
+            'participantTrips' => $participantTrips
         ]);
     }
 }
