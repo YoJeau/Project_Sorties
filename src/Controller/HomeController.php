@@ -34,7 +34,12 @@ class HomeController extends AbstractController
      * @throws \DateMalformedStringException
      */
     #[Route('/', name: 'app_home', methods: ['GET', 'POST'])]
-    public function index(Request $request, PaginatorInterface $paginator, FilterService $filterService, #[CurrentUser] ?Participant $participant): Response
+    public function index(
+        Request $request,
+        PaginatorInterface $paginator,
+        FilterService $filterService,
+        #[CurrentUser] ?Participant $participant
+    ): Response
     {
         if (is_null($participant)) return $this->redirectToRoute('app_login');
 
