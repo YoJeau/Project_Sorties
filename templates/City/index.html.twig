@@ -6,7 +6,10 @@
 {% endblock %}
 {% block body %}
     <div class="container-fluid d-flex flex-column justify-content-center mt-5">
-        <h2 class="text-center">Gestion des villes</h2>
+        <div class="d-flex justify-content-around ">
+            <h2 class="text-center">Gestion des villes</h2>
+            <button type="button" class="btn btn-info" id="add-city">Ajouter une ville</button>
+        </div>
         <div class="container mt-4">
             <table class="table table-hover" id="city-datatable">
                 <thead class="border border-primary">
@@ -20,14 +23,16 @@
                     {% for key, city in cities %}
                         <tr class="border-bottom" data-city-id="{{ city.getId() }}">
                             <td >
+                                <label for="city-name-{{ key }}" hidden >{{ city.getCitName() }}</label>
                                 <input class="form-control bg-transparent text-white" type="text" name="city-name" id="city-name-{{ key }}" value="{{ city.getCitName() }}" disabled>
                             </td>
                             <td>
-                                <input class="form-control bg-transparent text-white" type="text" name="city-name" id="city-name{{ key }}" value="{{ city.getCitPostCode() }}" disabled>
+                                <label for="city-name{{ key }}" hidden> {{ city.getCitPostCode() }}</label>
+                                <input class="form-control bg-transparent text-white" type="text" name="city-post-code" id="city-name{{ key }}" value="{{ city.getCitPostCode() }}" disabled>
                             </td>
                             <td class="w-25 text-center">
                                 <button type="button" class="btn btn-primary modify" id="modify-city-{{ key }}" data-save="no">Modifier</button>
-                                <button type="button" class="btn btn-danger modify delete " id="delete-city-{{ key }}"> Supprimer</button>
+                                <button type="button" class="btn btn-danger delete " id="delete-city-{{ key }}"> Supprimer</button>
                             </td>
                         </tr>
                     {%  endfor %}

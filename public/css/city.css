@@ -8,3 +8,6 @@ tr.border-bottom {
     border-bottom: 1px solid #5B21B6 !important; /* Couleur de bordure Bootstrap */
 }
 
+.border {
+    border: 1px solid #5B21B6 !important;
+}
