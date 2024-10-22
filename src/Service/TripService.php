@@ -24,19 +24,20 @@ class TripService
         return false;
     }
 
-    public function createTrip(Trip $trip, Location $location, Participant $participant, $state)
+    public function createTrip(Trip $trip,State $state, Participant $organizer): void
     {
-        // Associer le lieu au voyage
-        $trip->setTriLocation($location);
-
-        // Associer l'état et l'organisateur
         $trip->setTriState($state);
-        $trip->setTriOrganiser($participant);
-
-        // Sauvegarder le voyage
+        $trip->setTriOrganiser($organizer);
         $this->entityManager->persist($trip);
+        $this->entityManager->flush();
+    }
 
-        return $trip;
+    public function updateTrip(Trip $trip, Location $location, State $state, Participant $organizer): void
+    {
+        $trip->setTriLocation($location);
+        $trip->setTriState($state);
+        $trip->setTriOrganiser($organizer);
+        $this->entityManager->flush();
     }
 
     private function checkOrganiser(Trip $trip, Participant $participant){
