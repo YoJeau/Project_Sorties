@@ -3,7 +3,7 @@
 {% block title %}{{ parent() }}-Accueil{% endblock %}
 
 {% block body %}
-    <div class="d-none d-sm-block">
+    <div class="d-none d-lg-block">
         <div class="lead container d-flex flex-column align-items-end mt-2">
             <p>Date du jour : {{ "now"|date("d/m/Y") }}</p>
             {% if app.user %}
@@ -23,7 +23,7 @@
             </a>
         </div>
     </div>
-    <div class="d-flex flex-column d-sm-none gap-3 p-3 mobile-home">
+    <div class="d-flex flex-column d-lg-none gap-3 p-3 mobile-home">
         {% include 'home/_mobile_view.html.twig' %}
     </div>
 {% endblock %}
