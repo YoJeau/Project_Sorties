@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Après 4 secondes on fait disparaître le message
         setTimeout(function() {
             message.style.transition = "opacity 1s ease";
-            message.style.opacity = 0;
+            message.style.opacity = "0";
             setTimeout(function() {
                 message.remove();
             }, 1000);

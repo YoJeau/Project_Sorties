@@ -10,7 +10,6 @@ use App\Entity\Trip;
 use App\Form\CityType;
 use App\Form\LocationType;
 use App\Form\TripType;
-use App\Repository\CityRepository;
 use App\Repository\LocationRepository;
 use App\Repository\StateRepository;
 use App\Repository\TripRepository;
@@ -28,7 +27,7 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 #[Route('/trip', name: 'app_trip')]
 class TripController extends AbstractController
 {
-    public function __construct(TripService $tripService,CityService $cityService,LocationService $locationService,StateService $stateService){
+    public function __construct(TripService $tripService, CityService $cityService, LocationService $locationService, StateService $stateService){
         $this->tripService = $tripService;
         $this->cityService = $cityService;
         $this->locationService = $locationService;
@@ -114,7 +113,7 @@ class TripController extends AbstractController
 
         if(!$this->tripService->checkDateTripForm($trip)){
             $this->addFlash('danger','La date de clôture doit se terminer avant la date de début');
-            return $this->redirectToRoute('app_update_get',['id'=>$trip->getId()], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_trip_update_get',['id'=>$trip->getId()], Response::HTTP_SEE_OTHER);
         }
 
         if ($tripForm->isSubmitted() && $tripForm->isValid()) {
@@ -227,7 +226,7 @@ class TripController extends AbstractController
 
         if(!$this->tripService->checkDateTripForm($trip)){
             $this->addFlash('danger','La date de clôture doit se terminer avant la date de début');
-            return $this->redirectToRoute('app_update_get',['id'=>$trip->getId()], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_trip_update_get',['id'=>$trip->getId()], Response::HTTP_SEE_OTHER);
         }
 
         if ($tripForm->isSubmitted() && $tripForm->isValid()) {

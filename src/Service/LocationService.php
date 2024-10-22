@@ -2,19 +2,15 @@
 namespace App\Service;
 
 use App\Entity\Location;
-use App\Entity\City;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\LocationRepository;
 
 class LocationService
 {
-    private $entityManager;
-    private $locationRepository;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(EntityManagerInterface $entityManager, LocationRepository $locationRepository)
+    public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->locationRepository = $locationRepository;
     }
 
     public function handleLocationChange(Location $currentLocation, Location $newLocation): Location

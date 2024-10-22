@@ -121,13 +121,7 @@ class StateService
         }
 
         // Rechercher l'état dans la base de données
-        $state = $this->stateRepository->findOneBy(['staLabel' => $stateLabel]);
-
-        // Si l'état n'est pas trouvé, on lève une exception (ou tu peux gérer cela autrement)
-        if (!$state) {
-            throw new \Exception(sprintf('L\'état "%s" n\'existe pas dans la base de données.', $stateLabel));
-        }
-        return $state;
+        return $this->stateRepository->findOneBy(['staLabel' => $stateLabel]);
     }
 
     private function updateTripState($trip, $newStateLabel)

@@ -10,8 +10,8 @@ use App\Repository\CityRepository;
 
 class CityService
 {
-    private $entityManager;
-    private $cityRepository;
+    private EntityManagerInterface $entityManager;
+    private CityRepository $cityRepository;
 
     public function __construct(EntityManagerInterface $entityManager, CityRepository $cityRepository)
     {

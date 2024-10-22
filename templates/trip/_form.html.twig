@@ -82,7 +82,7 @@
 
 <div class="d-flex flex-row justify-content-center m-3 gap-3">
     <button type="submit" class="btn btn-success">Enregistrer</button>
-    <button type="submit" class="btn btn-danger">Annuler</button>
+    <button type="button" onClick="window.history.back();" class="btn btn-danger">Annuler</button>
 </div>
 
 {{ form_end(tripForm, {render_rest: false}) }}

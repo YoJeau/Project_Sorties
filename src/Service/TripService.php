@@ -11,16 +11,16 @@ use Doctrine\ORM\EntityManagerInterface;
 class TripService
 {
 
-    public function __construct(private EntityManagerInterface $entityManager){
-        $this->entityManager = $entityManager;
-    }
+    public function __construct(private readonly EntityManagerInterface $entityManager)
+    { }
 
-    public function checkUpdate( Trip $trip, Participant $participant){
+    public function checkUpdate( Trip $trip, Participant $participant): bool
+    {
         $isValid = true ;
         $isValid &= $this->checkOrganiser($trip, $participant);
         $isValid &= $this->checkStateTrip($trip);
 
-        if($isValid)return true;
+        if($isValid) return true;
         return false;
     }
 
@@ -40,17 +40,20 @@ class TripService
         $this->entityManager->flush();
     }
 
-    private function checkOrganiser(Trip $trip, Participant $participant){
+    private function checkOrganiser(Trip $trip, Participant $participant): bool
+    {
         if($trip->getTriOrganiser()->getId() != $participant->getId()) return false;
         return true;
     }
 
-    private function checkStateTrip(Trip $trip){
+    private function checkStateTrip(Trip $trip): bool
+    {
         if($trip->getTriState()->getStaLabel() != State::STATE_CREATED) return false;
         return true;
     }
 
-    public function checkDateTripForm(Trip $trip){
+    public function checkDateTripForm(Trip $trip): bool
+    {
         if($trip->getTriClosingDate() > $trip->getTriStartingDate()) return false;
         return true;
     }

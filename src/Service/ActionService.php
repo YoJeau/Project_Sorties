@@ -7,7 +7,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ActionService
 {
-
     public function __construct(UrlGeneratorInterface $urlGenerator){
         $this->urlGenerator = $urlGenerator;
     }
