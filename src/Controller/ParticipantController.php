@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use League\Csv\Exception;
 use League\Csv\UnavailableStream;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -144,7 +145,8 @@ class ParticipantController extends AbstractController
     public function new(
         Request $request,
         EntityManagerInterface $entityManager,
-        UserPasswordHasherInterface $passwordHasher
+        UserPasswordHasherInterface $passwordHasher,
+        ParameterBagInterface $parameterBag
     ): Response
     {
         $participant = new Participant();
@@ -153,13 +155,13 @@ class ParticipantController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $participant->setPassword($passwordHasher->hashPassword($participant, 'bonjour-ENI-123'));
+            $password = $parameterBag->get('default_pwd');
+            $participant->setPassword($passwordHasher->hashPassword($participant, $password));
             $participant->setRoles(['ROLE_USER']);
             $participant->setParIsActive(true);
 
             $entityManager->persist($participant);
             $entityManager->flush();
-
 
             return $this->redirectToRoute('app_participant_administration');
         }
