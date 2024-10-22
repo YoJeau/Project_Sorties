@@ -42,7 +42,12 @@ security:
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
-        - { path: ^/participant, roles: ROLE_USER }
+        - { path: ^/participant/my-profile, roles: ROLE_USER }
+        - { path: ^/participant/show, roles: ROLE_USER }
+        - { path: ^/participant/administration, roles: ROLE_ADMIN }
+        - { path: ^/city, roles: ROLE_ADMIN }
+        - { path: ^/participant/new, roles: ROLE_ADMIN }
+        - { path: ^/participant/import, roles: ROLE_ADMIN }
         - { path: ^/trip, roles: ROLE_USER }
         - { path: ^/site, roles: ROLE_ADMIN}
 
