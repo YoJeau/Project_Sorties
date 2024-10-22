@@ -7,8 +7,9 @@ use App\Entity\Trip;
 use App\Repository\StateRepository;
 use App\Repository\TripRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
-class CheckStateService
+class StateService
 {
     private TripRepository $tripRepository;
     private StateRepository $stateRepository;
@@ -127,6 +128,19 @@ class CheckStateService
             $this->updateTripState($trip,State::STATE_ARCHIVED);
         }
 
+    }
+
+    public function getStateForm(Request $request): ?State
+    {
+        // Vérifier si un état est fourni dans la requête
+        if (isset($request->get('trip')['state'])) {
+            $stateLabel = State::STATE_OPEN; // État "Ouvert"
+        } else {
+            $stateLabel = State::STATE_CREATED; // État "Créé"
+        }
+
+        // Rechercher l'état dans la base de données
+        return $this->stateRepository->findOneBy(['staLabel' => $stateLabel]);
     }
 
     private function updateTripState($trip, $newStateLabel): void

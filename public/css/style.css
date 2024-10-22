@@ -1,6 +1,9 @@
 .togglePublier {
     height: 10%;
 }
+.flash-message {
+    transition: opacity 1s ease;
+}
 
 #inputPublier{
     width: 12%;

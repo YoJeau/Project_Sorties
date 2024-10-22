@@ -53,12 +53,14 @@ class TripType extends AbstractType
                 'label_attr' => ['class' => 'w-50'],
                 'class' => Site::class,
                 'choice_label' => 'sitName',
+                'placeholder' => "-- Choisir un site --",
             ])
             ->add('triLocation', EntityType::class, [
                 'label' => "Lieu",
                 'label_attr' => ['class' => 'w-50'],
                 'class' => Location::class,
                 'choice_label' => 'locName',
+                'placeholder' => "-- Choisir un lieu --",
             ])
             ->add('triCancellationReason', TextareaType::class, [
                 'label' => 'Motif',
