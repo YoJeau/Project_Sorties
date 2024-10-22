@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ parent() }}-Gestion des villes{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/city.css') }}">
+{% endblock %}
+{% block body %}
+    <div class="container-fluid d-flex flex-column justify-content-center mt-5">
+        <h2 class="text-center">Gestion des villes</h2>
+        <div class="container mt-4">
+            <table class="table table-hover" id="city-datable">
+                <thead class="border border-primary">
+                    <tr class="table-primary">
+                        <th>Ville</th>
+                        <th>Code Postale</th>
+                        <th> Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for city in cities %}
+                        <tr class="border-bottom" data-city-id="{{ city.getId() }}">
+                            <td class="" >{{ city.getCitName() }}</td>
+                            <td class="">{{ city.getCitPostCode() }}</td>
+                            <td class="w-25 text-center">
+                                <button type="button" class="btn btn-primary" id="modify-city">Modifier</button>
+                                <button type="button" class="btn btn-danger"> Supprimer</button>
+                            </td>
+                        </tr>
+                    {%  endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/manageCity.js') }}"></script>
+{% endblock %}
