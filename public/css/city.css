@@ -1,4 +1,10 @@
+input:disabled {
+    background-color: #f0f0f0; /* Couleur de fond */
+    color: #000; /* Couleur du texte */
+    opacity: 1; /* Assurez-vous que l'élément est opaque */
+}
+
 tr.border-bottom {
-    border-bottom: 1px solid red !important; /* Couleur de bordure Bootstrap */
+    border-bottom: 1px solid #5B21B6 !important; /* Couleur de bordure Bootstrap */
 }
 
