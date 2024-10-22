@@ -65,7 +65,7 @@ class CityService
      * 1. Récupère le nom et le code postal de la ville à partir des données fournies.
      * 2. Vérifie si des données valides de ville sont présentes.
      * 3. Recherche une ville existante dans la base de données.
-     * 4. Si la ville n'existe pas, crée une nouvelle instance de City.
+     * 4. Si la ville n'existe pas, crée une nouvelle instance de city.
      * 5. Associe la ville à la localisation.
      * 6. Persiste la localisation dans la base de données.
      */
@@ -125,10 +125,10 @@ class CityService
      * - Crée une nouvelle ville si aucune ville correspondante n'est trouvée.
      * - Retourne soit la nouvelle ville, soit la ville existante, soit la ville actuelle en fonction des conditions.
      *
-     * @param City $currentCity - L'entité City actuelle avant la mise à jour.
-     * @param City $newCity - L'entité City proposée pour la mise à jour.
+     * @param City $currentCity - L'entité city actuelle avant la mise à jour.
+     * @param City $newCity - L'entité city proposée pour la mise à jour.
      *
-     * @return City - L'entité City à utiliser (soit la nouvelle, soit l'existante, soit l'actuelle).
+     * @return City - L'entité city à utiliser (soit la nouvelle, soit l'existante, soit l'actuelle).
      *
      * Flux de contrôle :
      * 1. Vérifie si les identifiants des deux villes sont différents.
@@ -160,16 +160,16 @@ class CityService
         return $currentCity;
     }
 
-    public function addCity($cityData): bool
+    public function addCity($cityData):?int
     {
         list($city, $isNew) = $this->findOrCreateCity($cityData['citName'], $cityData['citPostCode']);
 
         if ($isNew) {
             $this->entityManager->flush(); // Ne persiste que si une nouvelle ville a été créée
-            return true; // La ville a été ajoutée avec succès
+            return $city->getId(); // retourne l'id de la ville pour la vue
         }
 
-        return false; // La ville existe déjà, donc rien n'a été ajouté
+        return null; // La ville existe déjà, donc rien n'a été ajouté
     }
 
 

@@ -64,13 +64,13 @@ class TripController extends AbstractController
      * @Route("/new", name="_post", methods={"POST"})
      *
      * Cette méthode permet de traiter la création d'un nouveau voyage (Trip).
-     * Elle gère les soumissions de formulaires pour les entités Trip, Location, et City,
+     * Elle gère les soumissions de formulaires pour les entités Trip, Location, et city,
      * et délègue les opérations spécifiques à des services dédiés pour assurer une meilleure séparation des responsabilités.
      *
      * Fonctionnalités principales :
-     * - Valide les données soumises dans les formulaires (Location, City, Trip).
+     * - Valide les données soumises dans les formulaires (Location, city, Trip).
      * - Vérifie la cohérence des dates du voyage (date de début et date de clôture).
-     * - Si les champs relatifs à la ville (City) sont renseignés, elle vérifie si la ville existe déjà ou la crée.
+     * - Si les champs relatifs à la ville (city) sont renseignés, elle vérifie si la ville existe déjà ou la crée.
      * - Persiste les données de la localisation et du voyage.
      * - Utilise des services pour décomposer la logique métier, rendant le code plus maintenable.
      *
@@ -86,7 +86,7 @@ class TripController extends AbstractController
      * 3. Validation des données du formulaire de voyage.
      * 4. Vérification de la validité des dates de voyage via `tripService->checkDateTripForm()`.
      * 5. Gestion de la création de la ville si les champs sont remplis via `cityService`.
-     * 6. Persistance des entités Trip, Location, et City.
+     * 6. Persistance des entités Trip, Location, et city.
      * 7. Redirection vers la page d'accueil avec un message de succès après persistance.
      */
     #[Route('/new', name: '_post', methods: ['POST'])]
@@ -148,8 +148,8 @@ class TripController extends AbstractController
      *
      * Fonctionnalités principales :
      * - Vérifie si l'utilisateur connecté a l'autorisation de modifier la sortie.
-     * - Récupère les données existantes pour le voyage (Trip), la localisation (Location) et la ville (City).
-     * - Crée les formulaires associés (Trip, Location, City) pré-remplis avec les données actuelles.
+     * - Récupère les données existantes pour le voyage (Trip), la localisation (Location) et la ville (city).
+     * - Crée les formulaires associés (Trip, Location, city) pré-remplis avec les données actuelles.
      *
      * @param Trip $trip - L'entité Trip à mettre à jour, récupérée via l'ID dans l'URL.
      * @param Participant|null $participant - L'utilisateur actuellement connecté (ou null s'il n'est pas authentifié).

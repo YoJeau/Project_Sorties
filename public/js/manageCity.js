@@ -102,12 +102,19 @@ function addNewCityRow() {
     try {
         const response = await sendCityData(`/city/create`, city, 'POST'); // Adaptez l'URL selon votre route
         if (response && response.status === 'success') {
-            // Swal.fire({
-            //     icon: 'success',
-            //     title: 'Ajouté !',
-            //     text: 'Ville ajoutée avec succès.'
-            // });
-            location.reload();
+            const cityId = response.cityId;
+            addCityToTable({
+                id: cityId,
+                citName: cityName,
+                citPostCode: postCode
+            })
+            Swal.fire({
+                icon: 'success',
+                title: 'Ajouté !',
+                text: 'Ville ajoutée avec succès.'
+            });
+
+            newRow.remove(city);
             // Ajoutez ici le code pour mettre à jour le tableau avec les nouvelles données, si nécessaire
         } else {
             Swal.fire({
@@ -125,6 +132,78 @@ function addNewCityRow() {
     }
 
 }
+
+function addCityToTable(city) {
+    const tableBody = document.querySelector('#city-datatable tbody');
+
+    // Créer une nouvelle ligne
+    const newRow = document.createElement('tr');
+    newRow.classList.add('border-bottom');
+    newRow.setAttribute('data-city-id', city.id); // Ajoutez l'ID de la ville
+
+    // Créer la cellule pour la ville
+    const cityCell = document.createElement('td');
+    const cityLabel = document.createElement('label');
+    cityLabel.setAttribute('for', `city-name-${city.id}`);
+    cityLabel.hidden = true;
+    cityLabel.textContent = city.citName;
+
+    const cityInput = document.createElement('input');
+    cityInput.classList.add('form-control', 'bg-transparent', 'text-white');
+    cityInput.setAttribute('type', 'text');
+    cityInput.setAttribute('name', 'city-name');
+    cityInput.setAttribute('id', `city-name-${city.id}`);
+    cityInput.setAttribute('value', city.citName);
+    cityInput.setAttribute('disabled', true);
+
+    cityCell.appendChild(cityLabel);
+    cityCell.appendChild(cityInput);
+
+    // Créer la cellule pour le code postal
+    const postCodeCell = document.createElement('td');
+    const postCodeLabel = document.createElement('label');
+    postCodeLabel.setAttribute('for', `city-post-code-${city.id}`);
+    postCodeLabel.hidden = true;
+    postCodeLabel.textContent = city.citPostCode;
+
+    const postCodeInput = document.createElement('input');
+    postCodeInput.classList.add('form-control', 'bg-transparent', 'text-white');
+    postCodeInput.setAttribute('type', 'text');
+    postCodeInput.setAttribute('name', 'city-post-code');
+    postCodeInput.setAttribute('id', `city-post-code-${city.id}`);
+    postCodeInput.setAttribute('value', city.citPostCode);
+    postCodeInput.setAttribute('disabled', true);
+
+    postCodeCell.appendChild(postCodeLabel);
+    postCodeCell.appendChild(postCodeInput);
+
+    // Créer la cellule pour les actions
+    const actionCell = document.createElement('td');
+    actionCell.classList.add('w-25', 'text-center');
+
+    const modifyButton = document.createElement('button');
+    modifyButton.classList.add('btn', 'btn-primary', 'me-1','modify');
+    modifyButton.setAttribute('id', `modify-city-${city.id}`);
+    modifyButton.setAttribute('data-save', 'no');
+    modifyButton.textContent = 'Modifier';
+
+    const deleteButton = document.createElement('button');
+    deleteButton.classList.add('btn', 'btn-danger', 'delete');
+    deleteButton.setAttribute('id', `delete-city-${city.id}`);
+    deleteButton.textContent = 'Supprimer';
+
+    actionCell.appendChild(modifyButton);
+    actionCell.appendChild(deleteButton);
+
+    // Ajouter les cellules à la nouvelle ligne
+    newRow.appendChild(cityCell);
+    newRow.appendChild(postCodeCell);
+    newRow.appendChild(actionCell);
+
+    // Ajouter la nouvelle ligne à la fin du tableau
+    tableBody.appendChild(newRow);
+}
+
 
 function setupModifyButtons() {
     const tableBody = document.querySelector('#city-datatable tbody');
@@ -273,8 +352,6 @@ async function confirmDeleteCity(id,row) {
 }
 
 
-
-// Fonction générique pour envoyer des données avec fetch
 async function sendCityData(url, data, method = 'POST') {
     try {
         const response = await fetch(url, {

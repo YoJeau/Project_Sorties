@@ -32,8 +32,16 @@ class CityController extends AbstractController
     #[Route('/create', name: 'create')]
     public function addCity(Request $request){
         $data = json_decode($request->getContent(), true);
-        if(!$this->cityService->addCity($data)) return new JsonResponse(['status' => 'error', 'message' => 'Cette ville existe deja'], 400);
-        return new JsonResponse(['status' => 'success', 'message' => 'Ville créée avec succès.'], 200);
+        $cityId = $this->cityService->addCity($data);
+        if($cityId) {
+            return new JsonResponse([
+                'status' => 'success',
+                'message' => 'Ville ajoutée avec succès.',
+                'cityId' => $cityId, // Renvoyer l'ID de la ville ajoutée
+            ]);
+        } else{
+            return new JsonResponse(['status' => 'error', 'message' => 'Cette ville existe deja'], 400);
+        }
     }
 
     #[Route('/update/{id}', name: 'update',methods: ['POST'])]
