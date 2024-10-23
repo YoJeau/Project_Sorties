@@ -23,7 +23,7 @@
             <div class="d-flex flex-row justify-content-center gap-5 mt-5">
                 <button type="submit" class="btn btn-success">Enregistrer</button>
                 <button type="reset" class="btn btn-secondary">Effacer</button>
-                <button type="button" onClick="window.history.back();" class="btn btn-danger">Annuler</button>
+                <a href="{{ path('app_participant_administration') }}"><button type="button" class="btn btn-danger">Annuler</button></a>
             </div>
 
             {{ form_end(form, {render_rest: false}) }}
