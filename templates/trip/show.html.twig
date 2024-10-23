@@ -2,48 +2,65 @@
 
 {% block body %}
 <div>
-    <h1 class="text-center mt-3">Afficher une sortie</h1>
-    <div class="d-flex flex-row gap-5 mt-5">
-        <div class="w-50 d-flex flex-row gap-3 justify-content-end">
-            <div>
-                <p>Nom de la sortie : </p>
-                <p>Date et heure de la sortie :</p>
-                <p>Date limite d'inscription :</p>
-                <p>Nombre de places :</p>
-                <p>Durée :</p>
-                <p>Description et infos :</p>
+    <div class="d-flex justify-content-center mt-5">
+        <div class="card {{ stateColors[trip.getTriState().getStaLabel()] }} w-50  mb-3">
+            <div class="card-header">
+                <h2 class="text-center">
+                    Détails de la sortie
+                </h2>
+                <h3 class="card-title text-center mt-3">{{ trip.triName }}</h3>
+                <h4 class="text-center mt-3">
+                    État: {{ trip.getTriState().getStaLabel() }}
+                </h4>
             </div>
-            <div>
-                <p>{{ trip.triName}}</p>
-                <p>{{ trip.triStartingDate|date("d/m/Y H:i") }}</p>
-                <p>{{ trip.triClosingDate|date("d/m/Y H:i") }}</p>
-                <p>{{ trip.triMaxInscriptionNumber}}</p>
-                <p>{{ trip.triDuration}} minutes</p>
-                <p>{{ trip.triDescription}}</p>
-            </div>
-        </div>
-        <div class="w-50 d-flex flex-row gap-3">
-            <div>
-                <p>Site organisateur :</p>
-                <p>Ville :</p>
-                <p>Lieu :</p>
-                <p>Rue :</p>
-                <p>Code postal :</p>
-                <p>Latitude :</p>
-                <p>Longitude :</p>
-            </div>
-            <div>
-                <p>{{ trip.triSite.sitName }}</p>
-                <p>{{ trip.triLocation.locCity.citName }}</p>
-                <p>{{ trip.triLocation.locName }}</p>
-                <p>{{ trip.triLocation.locStreet }}</p>
-                <p>{{ trip.triLocation.locCity.citPostCode }}</p>
-                <p>{{ trip.triLocation.locLatitude }}</p>
-                <p>{{ trip.triLocation.locLongitude }}</p>
+            <div class="card-body">
+                <div class="d-flex flex-row gap-5">
+                    <div class="w-50 d-flex flex-row gap-3 justify-content-end">
+                        <div>
+                            <p>Nom de la sortie : </p>
+                            <p>Date et heure de la sortie :</p>
+                            <p>Date limite d'inscription :</p>
+                            <p>Nombre de places :</p>
+                            <p>Durée :</p>
+                            <p>Description et infos :</p>
+                        </div>
+                        <div>
+                            <p class="text-light">{{ trip.triName}}</p>
+                            <p class="text-light">{{ trip.triStartingDate|date("d/m/Y H:i") }}</p>
+                            <p class="text-light">{{ trip.triClosingDate|date("d/m/Y H:i") }}</p>
+                            <p class="text-light">{{ trip.triMaxInscriptionNumber}}</p>
+                            <p class="text-light">{{ trip.triDuration}} minutes</p>
+                            <p class="text-light">{{ trip.triDescription}}</p>
+                        </div>
+                    </div>
+                    <div class="w-50 d-flex flex-row gap-3">
+                        <div>
+                            <p>Site organisateur :</p>
+                            <p>Ville :</p>
+                            <p>Lieu :</p>
+                            <p>Rue :</p>
+                            <p>Code postal :</p>
+                            <p>Latitude :</p>
+                            <p>Longitude :</p>
+                        </div>
+                        <div>
+                            <p class="text-light">{{ trip.triSite.sitName }}</p>
+                            <p class="text-light">{{ trip.triLocation.locCity.citName }}</p>
+                            <p class="text-light">{{ trip.triLocation.locName }}</p>
+                            <p class="text-light">{{ trip.triLocation.locStreet }}</p>
+                            <p class="text-light">{{ trip.triLocation.locCity.citPostCode }}</p>
+                            <p class="text-light">{{ trip.triLocation.locLatitude }}</p>
+                            <p class="text-light">{{ trip.triLocation.locLongitude }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flex-row mt-3 justify-content-center">
+                    {{ actions|raw }}
+                </div>
             </div>
         </div>
     </div>
-    <div class="d-flex justify-content-center mt-5">
+    <div class="d-flex justify-content-center mt-4">
         <div class="w-25" >
             {% if trip.triSubscribes|length > 0 %}
                 <p>Liste des participants inscrits :</p>

@@ -3,6 +3,7 @@ namespace App\Service;
 
 use App\Entity\Participant;
 use App\Entity\Trip;
+use App\Entity\State;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -19,7 +20,7 @@ class ActionService
      * @param Participant $user   L'utilisateur.
      * @param PaginationInterface $trips Un tableau d'objets Trip.
      */
-    public function determineAction(Participant $user, PaginationInterface $trips): array
+    public function determineAction(Participant $user, PaginationInterface|array $trips): array
     {
         $actions = [];
         foreach ($trips as $row) {
@@ -33,6 +34,13 @@ class ActionService
             ];
         }
         return $actions;
+    }
+
+    public function determineBtnAction(Trip $trip,Participant $user):string{
+        $isSubscribed = $this->isSubscribed($user, $trip);
+        $isOrganisator = $this->isOrganisator($user, $trip);
+        $state = $trip->getTriState()->getStaLabel();
+        return $actions = $this->createBtnActions($isSubscribed, $isOrganisator, $state,$trip->getId());
     }
 
     public function isSubscribed(Participant $user, Trip $row): bool
@@ -55,6 +63,21 @@ class ActionService
         return $this->urlGenerator->generate($nameRoute, ['id' => $param], UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
+    private function createBtnActions( bool $isSubscribed, bool  $isOrganisator, string $state,int $id): string{
+        if($state === State::STATE_OPEN) return $this->determineBtnAction($isSubscribed,$isOrganisator,$id);
+        return '';
+    }
+
+    private function createBtnOpenState(bool $isSubscribed,bool  $isOrganisator,int $id): string{
+        if($isSubscribed){
+            return " <a href='".$this->generatePath('app_subscribe_delete', $id)."'<button class='btn btn-danger' type='button'>Se désister</button></a>";
+        } else if ($isOrganisator){
+            return " <a href='".$this->generatePath('app_trip_cancel', $id)."'<button class='btn btn-danger' type='button'>Annuler</button></a>";
+        } else {
+            return " <a href='".$this->generatePath('app_subscribe', $id)."'<button class='btn btn-primary' type='button'>S'inscrire</button></a>";
+        }
+    }
+
     public function chooseAction(string $state, bool $isSubcribed, bool $isOrganisator, int $id): string
     {
         // Générer le lien "Afficher" commun à tous les états
@@ -62,10 +85,10 @@ class ActionService
 
         // Vérifier l'état pour déterminer les actions possibles
         return match ($state) {
-            'Ouverte' => $this->getOpenStateActions($isSubcribed, $isOrganisator, $id, $viewLink),
-            'Fermée' => $this->getClosedStateActions($isSubcribed, $id, $viewLink),
-            'Terminée', 'Clôturée', 'En Cours', 'Annulée' => $viewLink,
-            'En Création' => $this->getCreationStateActions($isOrganisator, $id),
+            State::STATE_OPEN => $this->getOpenStateActions($isSubcribed, $isOrganisator, $id, $viewLink),
+            State::STATE_CLOSED => $this->getClosedStateActions($isSubcribed, $id, $viewLink),
+            State::STATE_COMPLETED,State::STATE_CLOSED_SUBSCRIBE, State::STATE_IN_PROGRESS, State::STATE_CANCELLED => $viewLink,
+            State::STATE_CREATED => $this->getCreationStateActions($isOrganisator, $id),
             default => "Aucune action disponible",
         };
     }
