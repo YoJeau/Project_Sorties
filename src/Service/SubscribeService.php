@@ -46,7 +46,6 @@ class SubscribeService
         ]);
 
         $isPossible &= $subscribe !== null;
-        $isPossible &= $this->isOrganiser($trip, $user);
         $isPossible &= $this->checkState($trip);
 
         if ($isPossible) {
