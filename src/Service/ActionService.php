@@ -65,6 +65,8 @@ class ActionService
 
     private function createBtnActions( bool $isSubscribed, bool  $isOrganisator, string $state,int $id): string{
         if($state === State::STATE_OPEN) return $this->createBtnOpenState($isSubscribed,$isOrganisator,$id);
+        if($state == State::STATE_CLOSED_SUBSCRIBE) return $this->createBtnClosedSubcribeState($isSubscribed,$isOrganisator,$id);
+        if($state === State::STATE_CLOSED) return $this->createBtnClosedSubcribeState($isSubscribed,$isOrganisator,$id);
         return '';
     }
 
@@ -78,6 +80,15 @@ class ActionService
         }
     }
 
+    private function createBtnClosedSubcribeState(bool $isSubscribed,bool  $isOrganisator,int $id): string{
+        if($isSubscribed){
+            return " <a href='".$this->generatePath('app_subscribe_delete', $id)."'<button class='btn btn-danger' type='button'>Se désister</button></a>";
+        } else if ($isOrganisator){
+            return " <a href='".$this->generatePath('app_trip_cancel', $id)."'<button class='btn btn-danger' type='button'>Annuler</button></a>";
+        }
+        return '';
+    }
+
     public function chooseAction(string $state, bool $isSubcribed, bool $isOrganisator, int $id): string
     {
         // Générer le lien "Afficher" commun à tous les états
@@ -86,8 +97,9 @@ class ActionService
         // Vérifier l'état pour déterminer les actions possibles
         return match ($state) {
             State::STATE_OPEN => $this->getOpenStateActions($isSubcribed, $isOrganisator, $id, $viewLink),
-            State::STATE_CLOSED => $this->getClosedStateActions($isSubcribed, $id, $viewLink),
-            State::STATE_COMPLETED,State::STATE_CLOSED_SUBSCRIBE, State::STATE_IN_PROGRESS, State::STATE_CANCELLED => $viewLink,
+            State::STATE_CLOSED => $this->getClosedStateActions($isSubcribed, $isOrganisator,$id, $viewLink),
+            State::STATE_CLOSED_SUBSCRIBE => $this->getClosedSubscribeAction($isSubcribed, $id, $viewLink),
+            State::STATE_COMPLETED, State::STATE_IN_PROGRESS, State::STATE_CANCELLED => $viewLink,
             State::STATE_CREATED => $this->getCreationStateActions($isOrganisator, $id),
             default => "Aucune action disponible",
         };
@@ -109,11 +121,21 @@ class ActionService
         return $viewLink;
     }
 
-    private function getClosedStateActions(bool $isSubcribed, int $id, string $viewLink): string
+    public function getClosedSubscribeAction(bool $isSubcribed, int $id, string $viewLink): string{
+        if ($isSubcribed) {
+            $viewLink .= "<a href='".$this->generatePath('app_subscribe_delete', $id)."'  class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Se désister</span></a>";
+        }
+        return $viewLink;
+    }
+
+    private function getClosedStateActions(bool $isSubcribed,$isOrganisator, int $id, string $viewLink): string
     {
         if ($isSubcribed) {
             // Inscrit à un événement fermé
             $viewLink .= "<a href='".$this->generatePath('app_subscribe_delete', $id)."'  class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Se désister</span></a>";
+        } elseif ($isOrganisator) {
+            // Organisateur de l'événement
+            $viewLink .= "<a href='" . $this->generatePath('app_trip_cancel', $id) . "'  class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Annuler</span></a>";
         }
         // Seulement le lien "Afficher" si non inscrit
         return $viewLink;

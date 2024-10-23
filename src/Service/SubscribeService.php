@@ -83,7 +83,7 @@ class SubscribeService
 
     public function checkState($trip){
         $state = $trip->getTriState()->getStaLabel();
-        if($state === State::STATE_OPEN || $state === State::STATE_CLOSED) return true;
+        if($state === State::STATE_OPEN || $state === State::STATE_CLOSED || $state === State::STATE_CLOSED_SUBSCRIBE) return true;
         return false;
     }
 }
