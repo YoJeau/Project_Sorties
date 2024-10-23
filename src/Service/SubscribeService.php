@@ -39,15 +39,20 @@ class SubscribeService
     public function checkUnsubscribe($trip, $user){
         $isPossible = true;
 
-        // Récupérer l'abonnement en cours
+       // on recupère l'inscription si elle existe
         $subscribe= $this->subscribeRepository->findOneBy([
             'subTripId' => $trip,
             'subParticipantId' => $user
         ]);
 
+        // true si existe sinon false
         $isPossible &= $subscribe !== null;
+        //si organisateur on peut pas se desinscrire
+        $isPossible &= $this->isOrganiser($trip, $user);
+        // si l'état de la sortie permet encore de se désincrire
         $isPossible &= $this->checkState($trip);
 
+        //si toutes les conditions sont a vrai
         if ($isPossible) {
             $trip->removeSubscribe($subscribe);
             $user->removeParSubscribe($subscribe);
