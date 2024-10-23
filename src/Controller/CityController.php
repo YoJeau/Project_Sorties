@@ -22,15 +22,16 @@ class CityController extends AbstractController
         $this->entityManager = $entityManager;
         $this->locationService = $locationService;
     }
+  
     #[Route('/', name: 'index')]
     public function index(): Response
     {
-
         $cities = $this->cityRepository->findAll();
         return $this->render('city/index.html.twig', [
             'cities' => $cities,
         ]);
     }
+ 
     #[Route('/create', name: 'create')]
     public function addCity(Request $request): Response
     {

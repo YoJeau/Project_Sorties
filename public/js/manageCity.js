@@ -1,7 +1,7 @@
-
 document.addEventListener('DOMContentLoaded',async function(){
     await init();
 });
+
 async function init(){
     initDatatable();
     initBtnAdd();
@@ -203,7 +203,6 @@ function addCityToTable(city) {
     // Ajouter la nouvelle ligne à la fin du tableau
     tableBody.appendChild(newRow);
 }
-
 
 function setupModifyButtons() {
     const tableBody = document.querySelector('#city-datatable tbody');
