@@ -6,11 +6,11 @@
     <div class="d-flex justify-content-center p-3">
         <h1>Mon profil</h1>
     </div>
-    <div class="d-flex flex-row justify-content-between p-5">
+    <div class="d-flex flex-row justify-content-center mt-3">
         <div class="w-25">
             <img src="{{ asset('img/' ~ picture) }}" alt="{{ asset('img') }}" width="200">
         </div>
-        <div class="w-75">
+        <div class="w-50">
             {{ form_errors(form) }}
 
             {{ form_start(form) }}

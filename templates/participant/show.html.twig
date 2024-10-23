@@ -3,53 +3,28 @@
 {% block title %}Profil de {{ participant.parUsername }}{% endblock %}
 
 {% block body %}
-    <div class="d-flex justify-content-center p-3">
+    <div class="d-flex justify-content-center p-3 mt-3">
         <h1>{{ participant.parUsername }}</h1>
     </div>
-    <div class="d-flex flex-row justify-content-between p-5">
-        <div class="w-25">
+    <div class="d-flex flex-row p-5">
+        <div class="w-25 d-flex justify-content-end">
             <img src="{{ asset('img/' ~ (participant.parPicture ?: 'default.png')) }}" alt="{{ asset('img') }}" width="200">
         </div>
-        <div class="d-flex flex-row justify-content-center w-75">
-            <div class="d-flex justify-content-end w-25 px-3">
-                <div class="d-flex flex-column row-gap-3">
-                    <div>
-                        Prénom :
-                    </div>
-                    <div>
-                        Nom :
-                    </div>
-                    <div>
-                        Téléphone :
-                    </div>
-                    <div>
-                        Email :
-                    </div>
-                    <div>
-                        Ville de rattachement :
-                    </div>
-                </div>
+        <div class="d-flex flex-row justify-content-center w-50">
+            <div class="d-flex flex-column justify-content-center w-25">
+                <p>Prénom :</p>
+                <p>Nom :</p>
+                <p>Téléphone :</p>
+                <p>Email :</p>
+                <p>Ville de rattachement :</p>
             </div>
-            <div class="d-flex w-50 px-3">
-                <div class="d-flex flex-column row-gap-3">
-                    <div>
-                        {{ participant.parFirstName }}
-                    </div>
-                    <div>
-                        {{ participant.parLastName }}
-                    </div>
-                    <div>
-                        {{ participant.parPhone }}
-                    </div>
-                    <div>
-                        {{ participant.parEmail }}
-                    </div>
-                    <div>
-                        {{ participant.parSite.sitName }}
-                    </div>
-                </div>
+            <div class="d-flex flex-column w-25">
+                <p>{{ participant.parFirstName }}</p>
+                <p>{{ participant.parLastName }}</p>
+                <p>{{ participant.parPhone }}</p>
+                <p>{{ participant.parEmail }}</p>
+                <p>{{ participant.parSite.sitName }}</p>
             </div>
-
         </div>
     </div>
     <div class="d-flex justify-content-center p-3">

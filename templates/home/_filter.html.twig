@@ -4,7 +4,7 @@
         <div class="d-flex flex-row mt-3">
             <label for="name-site" class="me-2 form-label">Site: </label>
             <select class="form-select" name="name-site" id="name-site">
-                <option value="" selected disabled>--Choisissez un site</option>
+                <option value="" selected disabled>-- Choisissez un site</option>
                 {% for site in sites %}
                 <option value="{{ site.getId() }}" {% if filters.site is defined and filters.site == site.getId() %}selected{% endif %}>{{ site.getSitName() }}</option>
                 {% endfor %}
