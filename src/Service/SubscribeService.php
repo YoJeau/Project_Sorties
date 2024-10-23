@@ -47,8 +47,6 @@ class SubscribeService
 
         // true si existe sinon false
         $isPossible &= $subscribe !== null;
-        //si organisateur on peut pas se desinscrire
-        $isPossible &= $this->isOrganiser($trip, $user);
         // si l'état de la sortie permet encore de se désincrire
         $isPossible &= $this->checkState($trip);
 
