@@ -398,8 +398,6 @@ class TripController extends AbstractController
             return $this->redirectToRoute('app_home');
         }
 
-        $actions = $this->actionService->determineBtnAction($trip, $currentParticipant);
-
         $stateColors = [
             State::STATE_COMPLETED => "border-dark",
             State::STATE_OPEN => "border-light",
