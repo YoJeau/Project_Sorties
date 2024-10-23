@@ -64,7 +64,7 @@ class ActionService
     }
 
     private function createBtnActions( bool $isSubscribed, bool  $isOrganisator, string $state,int $id): string{
-        if($state === State::STATE_OPEN) return $this->determineBtnAction($isSubscribed,$isOrganisator,$id);
+        if($state === State::STATE_OPEN) return $this->createBtnOpenState($isSubscribed,$isOrganisator,$id);
         return '';
     }
 
