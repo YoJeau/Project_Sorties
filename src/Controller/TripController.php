@@ -395,7 +395,7 @@ class TripController extends AbstractController
 
         if(!$this->stateService->checkShowState($trip)){
             $this->addFlash('danger', "Vous ne pouvez pas afficher la sortie.");
-            $this->redirectToRoute('app_home');
+            return $this->redirectToRoute('app_home');
         }
 
         $actions = $this->actionService->determineBtnAction($trip, $currentParticipant);
