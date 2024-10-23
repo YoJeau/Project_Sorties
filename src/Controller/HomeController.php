@@ -16,6 +16,11 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class HomeController extends AbstractController
 {
+    private SiteRepository $siteRepository;
+    private TripRepository $tripRepository;
+    private ActionService $actionService;
+    private StateService $checkStateService;
+
     public function __construct(
         SiteRepository $siteRepository,
         TripRepository $tripRepository,
