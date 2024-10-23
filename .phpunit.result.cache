@@ -1,1 +1,1 @@
-{"version":1,"defects":[],"times":[]}
+{"version":1,"defects":{"App\\Tests\\SubscribeServiceTest::testCheckStateWithOpenState":4,"App\\Tests\\SubscribeServiceTest::testCheckStateWithClosedState":3},"times":{"App\\Tests\\SubscribeServiceTest::testCheckStateWithOpenState":0.048,"App\\Tests\\SubscribeServiceTest::testCheckStateWithClosedState":0.048,"App\\Tests\\SubscribeServiceTest::testCheckStateWithInvalidState":0.048}}
