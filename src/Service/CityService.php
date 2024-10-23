@@ -65,13 +65,20 @@ class CityService
      * 1. Récupère le nom et le code postal de la ville à partir des données fournies.
      * 2. Vérifie si des données valides de ville sont présentes.
      * 3. Recherche une ville existante dans la base de données.
-     * 4. Si la ville n'existe pas, crée une nouvelle instance de city.
+     * 4. Si la ville n'existe pas, crée une nouvelle instance de City.
      * 5. Associe la ville à la localisation.
      * 6. Persiste la localisation dans la base de données.
      */
     public function handleCityCreation(array $cityData, Location $location, Trip $trip): void
     {
-        list($city, $isNew) = $this->findOrCreateCity($cityData['citName'], $cityData['citPostCode']);
+        $cityArray = $this->findOrCreateCity($cityData['citName'], $cityData['citPostCode']);
+
+        if (is_null($cityArray)) {
+            return;
+        }
+
+        list($city, $isNew) = $cityArray;
+
         // Assigner la ville trouvée ou créée à la location
         $location->setLocCity($city);
         $trip->setTriLocation($location);
@@ -85,28 +92,34 @@ class CityService
      *
      * @param string|null $citName
      * @param string|null $citPostCode
-     * @return City
+     * @return ?array
      */
-    private function findOrCreateCity(?string $citName, ?string $citPostCode): array
+    private function findOrCreateCity(?string $citName, ?string $citPostCode): ?array
     {
-        if (!empty($citName) || !empty($citPostCode)) {
-            // Vérifier si la ville existe déjà
-            $foundCity = $this->cityRepository->findOneBy([
-                'citName' => $citName,
-                'citPostCode' => $citPostCode,
-            ]);
+        if (empty($citName) && empty($citPostCode)) {
+            return null;
+        }
+        // Vérifier si la ville existe déjà
+        $foundCity = $this->cityRepository->findOneBy([
+            'citName' => $citName,
+            'citPostCode' => $citPostCode,
+        ]);
 
-            // Si elle n'existe pas, on la crée
-            if ($foundCity === null) {
-                $city = new City();
-                $city->setCitName($citName);
-                $city->setCitPostCode($citPostCode);
-                $this->entityManager->persist($city); // Persist la nouvelle ville
-                return [$city, true]; // Retourner la nouvelle ville et indiquer qu'elle a été créée
-            }
+        // Si elle n'existe pas, on la crée
+        if ($foundCity !== null) {
             // Si elle existe, retourner l'instance trouvée et indiquer qu'elle n'a pas été créée
             return [$foundCity, false];
         }
+
+        $city = new City();
+        $city->setCitName($citName);
+        $city->setCitPostCode($citPostCode);
+
+        // Persist la nouvelle ville
+        $this->entityManager->persist($city);
+
+        // Retourner la nouvelle ville et indiquer qu'elle a été créée
+        return [$city, true];
     }
 
 
@@ -125,44 +138,50 @@ class CityService
      * - Crée une nouvelle ville si aucune ville correspondante n'est trouvée.
      * - Retourne soit la nouvelle ville, soit la ville existante, soit la ville actuelle en fonction des conditions.
      *
-     * @param City $currentCity - L'entité city actuelle avant la mise à jour.
-     * @param City $newCity - L'entité city proposée pour la mise à jour.
+     * @param City $currentCity - L'entité City actuelle avant la mise à jour.
+     * @param City $newCity - L'entité City proposée pour la mise à jour.
      *
-     * @return City - L'entité city à utiliser (soit la nouvelle, soit l'existante, soit l'actuelle).
+     * @return City - L'entité City à utiliser (soit la nouvelle, soit l'existante, soit l'actuelle).
      *
      * Flux de contrôle :
      * 1. Vérifie si les identifiants des deux villes sont différents.
-     * 2. Recherche une ville existante en utilisant le nom et le code postal de la nouvelle ville.
-     * 3. Si aucune ville n'est trouvée, la nouvelle ville est persistée.
-     * 4. Retourne la nouvelle ville si elle a été créée, sinon retourne la ville existante.
-     * 5. Si la ville n'a pas changé, retourne simplement la ville actuelle.
+     * 2. Si la ville n'a pas changé, retourne simplement la ville actuelle.
+     * 3. Recherche une ville existante en utilisant le nom et le code postal de la nouvelle ville.
+     * 4. Si aucune ville n'est trouvée, la nouvelle ville est persistée.
+     * 5. Retourne la nouvelle ville si elle a été créée, sinon retourne la ville existante.
      */
     public function handleCityChange(City $currentCity, City $newCity): City
     {
         // Vérifier si la ville a changé
-        if ($newCity->getId() !== $currentCity->getId()) {
-            // Vérifier si la ville existe déjà
-            $foundCity = $this->cityRepository->findOneBy([
-                'citName' => $newCity->getCitName(),
-                'citPostCode' => $newCity->getCitPostCode(),
-            ]);
-
-            if ($foundCity === null) {
-                // Créer une nouvelle ville
-                $this->entityManager->persist($newCity);
-                return $newCity;
-            } else {
-                // Retourner la ville existante
-                return $foundCity;
-            }
+        if ($newCity->getId() === $currentCity->getId()) {
+            // Si la ville n'a pas changé, retourner la ville actuelle
+            return $currentCity;
         }
-        // Si la ville n'a pas changé, retourner la ville actuelle
-        return $currentCity;
+
+        // Vérifier si la ville existe déjà
+        $foundCity = $this->cityRepository->findOneBy([
+            'citName' => $newCity->getCitName(),
+            'citPostCode' => $newCity->getCitPostCode(),
+        ]);
+
+        if ($foundCity === null) {
+            // Créer une nouvelle ville
+            $this->entityManager->persist($newCity);
+            return $newCity;
+        } else {
+            // Retourner la ville existante
+            return $foundCity;
+        }
     }
 
-    public function addCity($cityData):?int
+    public function addCity($cityData): ?int
     {
-        list($city, $isNew) = $this->findOrCreateCity($cityData['citName'], $cityData['citPostCode']);
+        $cityArray = $this->findOrCreateCity($cityData['citName'], $cityData['citPostCode']);
+        if (is_null($cityArray)) {
+            return null;
+        }
+
+        list($city, $isNew) = $cityArray;
 
         if ($isNew) {
             $this->entityManager->flush(); // Ne persiste que si une nouvelle ville a été créée
@@ -173,18 +192,21 @@ class CityService
     }
 
 
-    public function updateCity(City $city,$data):bool{
-        if(isset($data['citName']) && isset($data['citPostCode'])){
-            $city->setCitName($data['citName']);
-            $city->setCitPostCode($data['citPostCode']);
-            $this->entityManager->flush();
-            return true;
+    public function updateCity(City $city,$data): bool
+    {
+        if (!isset($data['citName']) || !isset($data['citPostCode'])) {
+            return false;
         }
-        return false;
+
+        $city->setCitName($data['citName']);
+        $city->setCitPostCode($data['citPostCode']);
+        $this->entityManager->flush();
+
+        return true;
     }
 
-
-    public function deleteCity(City $city): bool {
+    public function deleteCity(City $city): bool
+    {
         try {
             $this->entityManager->remove($city);
             $this->entityManager->flush();
@@ -193,5 +215,4 @@ class CityService
             return false;
         }
     }
-
 }

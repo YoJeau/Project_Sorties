@@ -17,7 +17,7 @@ class CityRepository extends ServiceEntityRepository
     }
 
     //    /**
-    //     * @return city[] Returns an array of city objects
+    //     * @return City[] Returns an array of City objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -31,7 +31,7 @@ class CityRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?city
+    //    public function findOneBySomeField($value): ?City
     //    {
     //        return $this->createQueryBuilder('c')
     //            ->andWhere('c.exampleField = :val')

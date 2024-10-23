@@ -16,7 +16,7 @@
                     <tr class="table-primary">
                         <th>Ville</th>
                         <th>Code Postale</th>
-                        <th> Actions</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -27,12 +27,12 @@
                                 <input class="form-control bg-transparent text-white" type="text" name="city-name" id="city-name-{{ key }}" value="{{ city.getCitName() }}" disabled>
                             </td>
                             <td>
-                                <label for="city-name{{ key }}" hidden> {{ city.getCitPostCode() }}</label>
+                                <label for="city-name{{ key }}" hidden>{{ city.getCitPostCode() }}</label>
                                 <input class="form-control bg-transparent text-white" type="text" name="city-post-code" id="city-name{{ key }}" value="{{ city.getCitPostCode() }}" disabled>
                             </td>
                             <td class="w-25 text-center">
                                 <button type="button" class="btn btn-primary modify" id="modify-city-{{ key }}" data-save="no">Modifier</button>
-                                <button type="button" class="btn btn-danger delete " id="delete-city-{{ key }}"> Supprimer</button>
+                                <button type="button" class="btn btn-danger delete " id="delete-city-{{ key }}">Supprimer</button>
                             </td>
                         </tr>
                     {%  endfor %}
