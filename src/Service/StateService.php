@@ -22,6 +22,11 @@ class StateService
         $this->entityManager = $entityManager;
     }
 
+    public function checkShowState(Trip $trip){
+        if($trip->getTriState()->getStaLabel() !== State::STATE_CREATED) return true;
+        return false;
+    }
+
     /**
      * @throws \DateMalformedStringException
      */
@@ -127,7 +132,6 @@ class StateService
         if($startDate < $limitDate){
             $this->updateTripState($trip,State::STATE_ARCHIVED);
         }
-
     }
 
     public function getStateForm(Request $request): ?State

@@ -13,6 +13,7 @@ use App\Form\TripType;
 use App\Repository\LocationRepository;
 use App\Repository\StateRepository;
 use App\Repository\TripRepository;
+use App\Service\ActionService;
 use App\Service\CityService;
 use App\Service\LocationService;
 use App\Service\StateService;
@@ -27,11 +28,12 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 #[Route('/trip', name: 'app_trip')]
 class TripController extends AbstractController
 {
-    public function __construct(TripService $tripService, CityService $cityService, LocationService $locationService, StateService $stateService){
+    public function __construct(TripService $tripService, CityService $cityService, LocationService $locationService, StateService $stateService,ActionService  $actionService){
         $this->tripService = $tripService;
         $this->cityService = $cityService;
         $this->locationService = $locationService;
         $this->stateService = $stateService;
+        $this->actionService = $actionService;
     }
 
     #[Route]
@@ -389,10 +391,31 @@ class TripController extends AbstractController
      * @return Response
      */
     #[Route('/{id}', name: '_show')]
-    public function show(Trip $trip): Response {
-        return $this->render('trip/show.html.twig', [
-           'trip' => $trip,
-        ]);
+    public function show(Trip $trip, #[CurrentUser] ?Participant $currentParticipant): Response {
 
+        if(!$this->stateService->checkShowState($trip)){
+            $this->addFlash('danger', "Vous ne pouvez pas afficher la sortie.");
+            $this->redirectToRoute('app_home');
+        }
+
+        $actions = $this->actionService->determineBtnAction($trip, $currentParticipant);
+
+        $stateColors = [
+            State::STATE_COMPLETED => "border-dark",
+            State::STATE_OPEN => "border-light",
+            State::STATE_CREATED => "border-primary",
+            State::STATE_CLOSED_SUBSCRIBE => "border-warning",
+            State::STATE_CANCELLED => "border-danger",
+            State::STATE_CLOSED => "border-secondary",
+            State::STATE_IN_PROGRESS => "border-success",
+            State::STATE_ARCHIVED => "border-dark"
+        ];
+
+        $actions = $this->actionService->determineBtnAction($trip,$currentParticipant);
+        return $this->render('trip/show.html.twig', [
+            'trip' => $trip,
+            "stateColors" => $stateColors,
+            "actions" => $actions,
+        ]);
     }
 }
