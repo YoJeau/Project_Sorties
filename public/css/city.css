@@ -1,4 +1,18 @@
 input:disabled {
+<<<<<<< 43-275-gestion-des-sorties-gérer-les-villes
+    background-color: #f0f0f0;
+    color: #000;
+    opacity: 1;
+}
+
+tr.border-bottom {
+    border-bottom: 1px solid #5B21B6 !important;
+}
+
+.border {
+    border: 1px solid #5B21B6 !important;
+}
+=======
     background-color: #f0f0f0; /* Couleur de fond */
     color: #000; /* Couleur du texte */
     opacity: 1; /* Assurez-vous que l'élément est opaque */
@@ -8,3 +22,4 @@ tr.border-bottom {
     border-bottom: 1px solid #5B21B6 !important; /* Couleur de bordure Bootstrap */
 }
 
+>>>>>>> main

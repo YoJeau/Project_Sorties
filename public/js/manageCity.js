@@ -1,4 +1,15 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded',async function(){
+    await init();
+});
+
+async function init(){
+    initDatatable();
+    initBtnAdd();
+    setupModifyButtons();
+    await handleDeleteCity();
+}
+
+function initDatatable() {
     const table = new DataTable('#city-datatable', {
         language: {
             processing: "Traitement...",
@@ -21,33 +32,222 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-});
+}
+
+function initBtnAdd(){
+    const btn = document.getElementById("add-city");
+    btn.addEventListener('click',function(){
+        addNewCityRow();
+    })
+}
+
+function addNewCityRow() {
+    const tableBody = document.querySelector('#city-datatable tbody');
+
+    // Créer une nouvelle ligne
+    const newRow = document.createElement('tr');
+    newRow.classList.add('border-bottom');
+
+    // Créer les cellules pour la ville et le code postal
+    const cityCell = document.createElement('td');
+    const postCodeCell = document.createElement('td');
+    const actionCell = document.createElement('td');
+    //ajout des classes au td action
+    actionCell.classList.add('w-25');
+    actionCell.classList.add('text-center');
+
+    // Ajouter des inputs pour la ville et le code postal
+    cityCell.innerHTML = `<input class="form-control bg-transparent text-white" type="text" placeholder="Nom de la ville">`;
+    postCodeCell.innerHTML = `<input class="form-control bg-transparent text-white" type="text" placeholder="Code postal">`;
+
+    // Créer les boutons Ajouter et Annuler
+    const addButton = document.createElement('button');
+    addButton.className = 'btn btn-success me-2 add';
+    addButton.type = 'button';
+    addButton.textContent = 'Ajouter';
+    addButton.addEventListener('click', async () => {
+        await handleAddCity(newRow); // Appeler la fonction d'ajout de ville
+    });
+
+    const cancelButton = document.createElement('button');
+    cancelButton.className = 'btn btn-danger';
+    cancelButton.type = 'button';
+    cancelButton.textContent = 'Annuler';
+    cancelButton.addEventListener('click', () => {
+        newRow.remove(); // Supprimer la ligne si l'utilisateur annule
+    });
+
+    // Ajouter les boutons à la cellule des actions
+    actionCell.appendChild(addButton);
+    actionCell.appendChild(cancelButton);
+
+    // Ajouter les cellules à la nouvelle ligne
+    newRow.appendChild(cityCell);
+    newRow.appendChild(postCodeCell);
+    newRow.appendChild(actionCell);
+
+    // Ajouter la nouvelle ligne au début du tableau
+    tableBody.prepend(newRow);
+}
+
+ async function handleAddCity(newRow) {
+    const inputs = newRow.querySelectorAll('input');
+    const cityName = inputs[0].value;
+    const postCode = inputs[1].value;
+    const city = {
+        'citName': cityName,
+        'citPostCode': postCode
+    }
+
+    try {
+        const response = await sendCityData(`/city/create`, city, 'POST'); // Adaptez l'URL selon votre route
+        if (response && response.status === 'success') {
+            const cityId = response.cityId;
+            addCityToTable({
+                id: cityId,
+                citName: cityName,
+                citPostCode: postCode
+            })
+            Swal.fire({
+                icon: 'success',
+                title: 'Ajouté !',
+                text: 'Ville ajoutée avec succès.'
+            });
+
+            newRow.remove(city);
+            // Ajoutez ici le code pour mettre à jour le tableau avec les nouvelles données, si nécessaire
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: response.message
+            });
+        }
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erreur',
+            text: error.message,
+        });
+    }
+
+}
+
+function addCityToTable(city) {
+    const tableBody = document.querySelector('#city-datatable tbody');
+
+    // Créer une nouvelle ligne
+    const newRow = document.createElement('tr');
+    newRow.classList.add('border-bottom');
+    newRow.setAttribute('data-city-id', city.id); // Ajoutez l'ID de la ville
+
+    // Créer la cellule pour la ville
+    const cityCell = document.createElement('td');
+    const cityLabel = document.createElement('label');
+    cityLabel.setAttribute('for', `city-name-${city.id}`);
+    cityLabel.hidden = true;
+    cityLabel.textContent = city.citName;
+
+    const cityInput = document.createElement('input');
+    cityInput.classList.add('form-control', 'bg-transparent', 'text-white');
+    cityInput.setAttribute('type', 'text');
+    cityInput.setAttribute('name', 'city-name');
+    cityInput.setAttribute('id', `city-name-${city.id}`);
+    cityInput.setAttribute('value', city.citName);
+    cityInput.setAttribute('disabled', true);
+
+    cityCell.appendChild(cityLabel);
+    cityCell.appendChild(cityInput);
+
+    // Créer la cellule pour le code postal
+    const postCodeCell = document.createElement('td');
+    const postCodeLabel = document.createElement('label');
+    postCodeLabel.setAttribute('for', `city-post-code-${city.id}`);
+    postCodeLabel.hidden = true;
+    postCodeLabel.textContent = city.citPostCode;
+
+    const postCodeInput = document.createElement('input');
+    postCodeInput.classList.add('form-control', 'bg-transparent', 'text-white');
+    postCodeInput.setAttribute('type', 'text');
+    postCodeInput.setAttribute('name', 'city-post-code');
+    postCodeInput.setAttribute('id', `city-post-code-${city.id}`);
+    postCodeInput.setAttribute('value', city.citPostCode);
+    postCodeInput.setAttribute('disabled', true);
+
+    postCodeCell.appendChild(postCodeLabel);
+    postCodeCell.appendChild(postCodeInput);
+
+    // Créer la cellule pour les actions
+    const actionCell = document.createElement('td');
+    actionCell.classList.add('w-25', 'text-center');
+
+    const modifyButton = document.createElement('button');
+    modifyButton.classList.add('btn', 'btn-primary', 'me-1','modify');
+    modifyButton.setAttribute('id', `modify-city-${city.id}`);
+    modifyButton.setAttribute('data-save', 'no');
+    modifyButton.textContent = 'Modifier';
+
+    const deleteButton = document.createElement('button');
+    deleteButton.classList.add('btn', 'btn-danger', 'delete');
+    deleteButton.setAttribute('id', `delete-city-${city.id}`);
+    deleteButton.textContent = 'Supprimer';
+
+    actionCell.appendChild(modifyButton);
+    actionCell.appendChild(deleteButton);
+
+    // Ajouter les cellules à la nouvelle ligne
+    newRow.appendChild(cityCell);
+    newRow.appendChild(postCodeCell);
+    newRow.appendChild(actionCell);
+
+    // Ajouter la nouvelle ligne à la fin du tableau
+    tableBody.appendChild(newRow);
+}
 
 function setupModifyButtons() {
-    const modifyButtons = document.querySelectorAll('.modify');
+    const tableBody = document.querySelector('#city-datatable tbody');
 
-    modifyButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Récupérer la ligne parente (tr) de ce bouton
-            const row = this.closest('tr');
-            // Vérifier la valeur de data-save
-            const isSaving = this.getAttribute('data-save') === 'yes';
+    // Délégation d'événements sur le body du tableau
+    tableBody.addEventListener('click', async function(event) {
+        const button = event.target.closest('button'); // Utilise closest pour obtenir le bouton cliqué
+
+        // Vérifie si le bouton cliqué a la classe 'modify'
+        if (button && button.classList.contains('modify')) {
+            const row = button.closest('tr');
+            const isSaving = button.getAttribute('data-save') === 'yes';
 
             if (isSaving) {
-                handleSave(row, this);
+               await handleSave(row, button);
             } else {
-                handleEdit(row, this);
+                handleEdit(row, button);
             }
-        });
+        }
+    });
+}
+
+function handleDeleteCity() {
+    const tableBody = document.querySelector('#city-datatable tbody');
+
+    // Délégation d'événements pour le bouton de suppression
+    tableBody.addEventListener('click', async function(event) {
+        const button = event.target.closest('button'); // Utilise closest pour obtenir le bouton cliqué
+
+        if (button && button.classList.contains('delete')) {
+            const row = button.closest('tr');
+            const id = row.getAttribute('data-city-id');
+
+            // Logique de suppression ici
+            await confirmDeleteCity(id, row);
+        }
     });
 }
 
 function handleEdit(row, button) {
     // Récupérer tous les inputs dans la ligne
     const inputs = row.querySelectorAll('input');
-
     // Activer les inputs
     inputs.forEach(input => {
+        input.classList.add('border');
         input.disabled = false; // Réactiver l'input
     });
 
@@ -64,34 +264,111 @@ function handleEdit(row, button) {
     }
 }
 
-function handleSave(row, button) {
-    // Récupérer tous les inputs dans la ligne
+async function handleSave(row, button) {
     const inputs = row.querySelectorAll('input');
-
-    // Exemple de récupération des valeurs des inputs pour traitement
+    const spans = row.querySelectorAll('label');
     const id = row.getAttribute('data-city-id');
-    const cityName = inputs[0].value; // Supposons que le nom de la ville est le premier input
-    const cityPostCode = inputs[1].value; // Supposons que le code postal est le deuxième input
+    const cityName = inputs[0].value;
+    const cityPostCode = inputs[1].value;
 
-    console.log('Enregistrer les données :', id,cityName, cityPostCode);
+    const city = {
+        'id': id,
+        'citName': cityName,
+        'citPostCode': cityPostCode,
+    };
 
-    // Désactiver les inputs
-    inputs.forEach(input => {
-        input.disabled = true; // Désactiver l'input après l'enregistrement
-    });
-
-    // Modifier le texte du bouton à "Modifier"
-    button.textContent = 'Modifier';
-
-    // Changer l'attribut data-save à "no"
-    button.setAttribute('data-save', 'no');
-
-    // Réactiver le bouton "Supprimer" si nécessaire
-    const deleteButton = row.querySelector('.delete');
-    if (deleteButton) {
-        deleteButton.disabled = false; // Réactive le bouton supprimer
+    try {
+        await sendCityData(`/city/update/${city.id}`, city, 'POST');
+        Swal.fire({
+            icon: 'success',
+            title: 'Succès',
+            text: 'Mise à jour effectuée avec succès',
+        });
+        spans[0].textContent = cityName;
+        spans[1].textContent = cityPostCode;
+        // Désactiver les inputs après enregistrement
+        inputs.forEach(input => {
+            input.disabled = true;
+            input.classList.remove('border');
+        });
+        button.textContent = 'Modifier';
+        button.setAttribute('data-save', 'no');
+        const deleteButton = row.querySelector('.delete');
+        if (deleteButton) {
+            deleteButton.disabled = false;
+        }
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erreur',
+            text: error.message,
+        });
     }
 }
 
-// Appeler la fonction pour configurer les boutons
-document.addEventListener('DOMContentLoaded', setupModifyButtons);
+
+async function confirmDeleteCity(id,row) {
+    // Afficher une boîte de dialogue pour confirmer la suppression
+    const result = await Swal.fire({
+        title: 'Êtes-vous sûr ?',
+        text: 'Cette action est irréversible. Voulez-vous vraiment supprimer cette ville ?',
+        icon: 'warning',
+        showCancelButton: true, // Ajoute un bouton "Annuler"
+        confirmButtonColor: '#d33', // Couleur du bouton de confirmation (rouge pour la suppression)
+        cancelButtonColor: '#3085d6', // Couleur du bouton d'annulation (bleu par défaut)
+        confirmButtonText: 'Oui, supprimer !',
+        cancelButtonText: 'Annuler',
+    });
+
+    // Si l'utilisateur clique sur "Oui"
+    if (result.isConfirmed) {
+        try {
+            const response = await sendCityData(`/city/delete/${id}`, null, 'POST'); // Utiliser la méthode DELETE
+            console.log(response);
+            if (response && response.status === 'success') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Supprimé !',
+                    text: response.message
+                });
+                // Supprimer la ligne de la table après la suppression
+                row.remove();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erreur',
+                    text: response.message
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: error.message,
+            });
+        }
+    }
+}
+
+
+async function sendCityData(url, data, method = 'POST') {
+    try {
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: data ? JSON.stringify(data) : null, // Envoyer le body seulement s'il y a des données
+        });
+
+        // Vérification de la réponse
+        if (!response.ok) {
+            const errorResponse = await response.json(); // Extraire le corps de la réponse
+            throw new Error(errorResponse.message || 'Erreur lors de l\'opération'); // Utiliser le message de l'erreur
+        }
+
+        return await response.json(); // Retourner la réponse (si nécessaire)
+    } catch (error) {
+        return { status: 'error', message: error.message }; // Retourner un message d'erreur
+    }
+}

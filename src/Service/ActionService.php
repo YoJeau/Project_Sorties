@@ -101,7 +101,7 @@ class ActionService
         $viewLink = '';
         if ($isOrganisator) {
             // L'organisateur peut modifier ou publier
-            $viewLink .= "<a href='' class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Modifier</span></a>".
+            $viewLink .= "<a href='" . $this->generatePath('app_trip_update_get', $id) . "' class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Modifier</span></a>".
                 "<a href='" . $this->generatePath('app_trip_publish', $id) . "' class='text-decoration-none'> <span class='badge rounded-pill bg-info'>Publier</span></a>";
         } else {
             $viewLink .= "Aucune action disponible";

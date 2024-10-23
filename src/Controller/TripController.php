@@ -85,7 +85,7 @@ class TripController extends AbstractController
      * 2. Gestion des formulaires de localisation et de ville.
      * 3. Validation des données du formulaire de voyage.
      * 4. Vérification de la validité des dates de voyage via `tripService->checkDateTripForm()`.
-     * 5. Gestion de la création de la ville si les champs sont remplis via `cityService`.
+     * 5. Gestion de la création de la ville si les champs sont remplis via `CityService`.
      * 6. Persistance des entités Trip, Location, et City.
      * 7. Redirection vers la page d'accueil avec un message de succès après persistance.
      */
