@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Les sites{% endblock %}
+
+{% block body %}
+
+    <h1 class="text-center mt-3"> Gérer les sites</h1>
+
+    {% include 'site/_addForm.html.twig' %}
+
+    {% include 'site/show.html.twig' %}
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/manageSite.js') }}" type="text/javascript"></script>
+{% endblock %}
