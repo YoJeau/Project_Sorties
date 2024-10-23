@@ -13,7 +13,7 @@
     </div>
 
     <div class="d-flex flew-row justify-content-center p-3">
-        <table class="table table-hover w-75">
+        <table id="participant-datatable" class="table table-hover">
             <thead>
                 <tr>
                     <th scope="col">ID</th>
@@ -44,4 +44,7 @@
             </tbody>
         </table>
     </div>
+{% endblock %}
+{% block javascripts %}
+    <script src="{{ asset('js/participant.js') }}"></script>
 {% endblock %}
