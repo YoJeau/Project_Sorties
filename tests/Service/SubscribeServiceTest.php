@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests;
+namespace App\Tests\Service;
 
 use App\Entity\State;
 use App\Entity\Trip;
@@ -14,8 +14,7 @@ class SubscribeServiceTest extends TestCase
 {
     private SubscribeService $subscribeService;
 
-    protected function setUp(): void
-    {
+    protected function setUp(): void {
         $tripRepository = $this->createMock(TripRepository::class);
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $subscribeRepository = $this->createMock(SubscribeRepository::class);
@@ -27,8 +26,7 @@ class SubscribeServiceTest extends TestCase
         );
     }
 
-        public function testCheckStateWithOpenState(): void
-    {
+    public function testCheckStateWithOpenState(): void {
         // Créer un mock pour l'entité State
         $state = $this->createMock(State::class);
         $state->method('getStaLabel')->willReturn(State::STATE_OPEN);
@@ -41,8 +39,7 @@ class SubscribeServiceTest extends TestCase
         $this->assertTrue($this->subscribeService->checkState($trip));
     }
 
-        public function testCheckStateWithClosedState(): void
-    {
+    public function testCheckStateWithClosedState(): void {
         $state = $this->createMock(State::class);
         $state->method('getStaLabel')->willReturn(State::STATE_CLOSED);
 
@@ -52,8 +49,7 @@ class SubscribeServiceTest extends TestCase
         $this->assertTrue($this->subscribeService->checkState($trip));
     }
 
-        public function testCheckStateWithInvalidState(): void
-    {
+    public function testCheckStateWithInvalidState(): void {
         $state = $this->createMock(State::class);
         $state->method('getStaLabel')->willReturn('invalid_state');
 
