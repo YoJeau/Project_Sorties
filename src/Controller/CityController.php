@@ -53,7 +53,7 @@ class CityController extends AbstractController
 
     #[Route('/delete/{id}', name: 'delete',methods: ['POST'])]
     public function deleteCity(City $city):JsonResponse{
-        if(!$this->locationService->isCityLinkedToLocation($city)) return new JsonResponse(['status' => 'error', 'message' => 'Cette vile est rattaché a une location'], 400);
+        if(!$this->locationService->isCityLinkedToLocation($city)) return new JsonResponse(['status' => 'error', 'message' => 'Cette vile est rattaché a un lieu'], 400);
         if(!$this->cityService->deleteCity($city)) return new JsonResponse(['status' => 'error', 'message' => 'Erreur lors de la suppression'], 400);
         return new JsonResponse(['status' => 'success', 'message' => 'Ville supprimée avec succès.'], 200);
     }
