@@ -96,9 +96,10 @@ class CityService
      */
     private function findOrCreateCity(?string $citName, ?string $citPostCode): ?array
     {
-        if (empty($citName) && empty($citPostCode)) {
+        if (empty($citName) || empty($citPostCode)) {
             return null;
         }
+
         // Vérifier si la ville existe déjà
         $foundCity = $this->cityRepository->findOneBy([
             'citName' => $citName,
