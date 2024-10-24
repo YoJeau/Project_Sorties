@@ -5,18 +5,15 @@ namespace App\Service;
 use App\Entity\State;
 use App\Entity\Subscribe;
 use App\Repository\SubscribeRepository;
-use App\Repository\TripRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class SubscribeService
 {
-    public function __construct(TripRepository $tripRepository, EntityManagerInterface $entityManager,SubscribeRepository $subscribeRepository){
-        $this->tripRepository = $tripRepository;
-        $this->entityManager = $entityManager;
-        $this->subscribeRepository = $subscribeRepository;
-    }
+    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly SubscribeRepository $subscribeRepository)
+    { }
 
-    public function checkSubscribe($trip, $user){
+    public function checkSubscribe($trip, $user): bool
+    {
 
         $isPossible = true;
         $isPossible &= $this->isOrganiser($trip, $user);
@@ -36,7 +33,8 @@ class SubscribeService
         return false;
     }
 
-    public function checkUnsubscribe($trip, $user){
+    public function checkUnsubscribe($trip, $user): bool
+    {
         $isPossible = true;
 
        // on recupère l'inscription si elle existe
@@ -61,7 +59,8 @@ class SubscribeService
         return false;
     }
 
-    private function alreadySubscribe($trip, $user){
+    private function alreadySubscribe($trip, $user): bool
+    {
         $subscribes = $trip->getTriSubscribes();
         foreach ($subscribes as $subscribe) {
             if ($subscribe->getSubParticipantId() === $user->getId()) {
@@ -71,19 +70,22 @@ class SubscribeService
         return true; // Pas déjà abonné, renvoie true
     }
 
-    private function isOrganiser($trip, $user){
+    private function isOrganiser($trip, $user): bool
+    {
         if($trip->getTriOrganiser()->getId() === $user->getId()) return false;
         return true;
     }
 
-    private function checkMaxSubscribe($trip){
+    private function checkMaxSubscribe($trip): bool
+    {
         $maxSubscribe = $trip->getTriMaxInscriptionNumber();
         $countSubscribe = count($trip->getTriSubscribes());
         // Vérifie si le nombre maximum est atteint
         return $countSubscribe < $maxSubscribe; // Renvoie true si le maximum n'est pas atteint
     }
 
-    public function checkState($trip){
+    public function checkState($trip): bool
+    {
         $state = $trip->getTriState()->getStaLabel();
         if($state === State::STATE_OPEN || $state === State::STATE_CLOSED || $state === State::STATE_CLOSED_SUBSCRIBE) return true;
         return false;

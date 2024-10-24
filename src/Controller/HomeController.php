@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Participant;
 use App\Entity\State;
 use App\Repository\SiteRepository;
 use App\Repository\TripRepository;
@@ -13,31 +14,25 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class HomeController extends AbstractController
 {
-    private SiteRepository $siteRepository;
-    private TripRepository $tripRepository;
-    private ActionService $actionService;
-    private StateService $checkStateService;
-
     public function __construct(
-        SiteRepository $siteRepository,
-        TripRepository $tripRepository,
-        ActionService  $actionService,
-        StateService   $checkStateService,
-    ){
-        $this->siteRepository = $siteRepository;
-        $this->tripRepository = $tripRepository;
-        $this->actionService = $actionService;
-        $this->checkStateService = $checkStateService;
-    }
+        #[CurrentUser] private readonly ?Participant $currentParticipant,
+        private readonly SiteRepository $siteRepository,
+        private readonly TripRepository $tripRepository,
+        private readonly ActionService $actionService,
+        private readonly StateService $checkStateService,
+        private readonly FilterService $filterService
+    )
+    { }
 
     /**
      * @throws \DateMalformedStringException
      */
     #[Route('/', name: 'app_home', methods: ['GET', 'POST'])]
-    public function index(Request $request, PaginatorInterface $paginator, FilterService $filterService): Response
+    public function index(Request $request, PaginatorInterface $paginator): Response
     {
         if (!$this->getUser()) return $this->redirectToRoute('app_login');
 
@@ -57,7 +52,7 @@ class HomeController extends AbstractController
             ];
             $user = $this->getUser();
 
-            $filteredTrips = $filterService->filterTrips($filters, $user);
+            $filteredTrips = $this->filterService->filterTrips($filters, $user);
 
             $trips = $paginator->paginate($filteredTrips, $request->query->getInt('page', 1), 10);
         } else {
@@ -65,7 +60,7 @@ class HomeController extends AbstractController
             $trips = $this->tripRepository->findNonArchivedTrips();
             $trips = $paginator->paginate($trips, $request->query->getInt('page', 1), 10);
         }
-        $actions = $this->actionService->determineAction($this->getUser(), $trips);
+        $actions = $this->actionService->determineAction($this->currentParticipant, $trips);
         $stateColors = [
             State::STATE_COMPLETED => "table-dark",
             State::STATE_OPEN => "table-light",
