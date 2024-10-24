@@ -6,7 +6,6 @@ use App\Entity\City;
 use App\Repository\CityRepository;
 use App\Service\CityService;
 use App\Service\LocationService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,12 +15,12 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/city',name:'app_city_')]
 class CityController extends AbstractController
 {
-    public function __construct(CityRepository $cityRepository,CityService $cityService,EntityManagerInterface $entityManager,LocationService $locationService){
-        $this->cityRepository = $cityRepository;
-        $this->cityService = $cityService;
-        $this->entityManager = $entityManager;
-        $this->locationService = $locationService;
-    }
+    public function __construct(
+        private readonly CityRepository $cityRepository,
+        private readonly CityService $cityService,
+        private readonly LocationService $locationService
+    )
+    { }
   
     #[Route('/', name: 'index')]
     public function index(): Response

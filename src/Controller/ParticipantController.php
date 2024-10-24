@@ -24,14 +24,6 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 #[Route('/participant', name: 'app_participant')]
 class ParticipantController extends AbstractController
 {
-    private ImageManagerService $imageManagerService;
-    private PasswordManagerService $passwordManagerService;
-
-    public function __construct(ImageManagerService $imageManagerService, PasswordManagerService $passwordManagerService){
-        $this->imageManagerService = $imageManagerService;
-        $this->passwordManagerService = $passwordManagerService;
-    }
-
     /**
      * Displays the participant administration panel,
      * with a list of participants and possible actions.
@@ -61,7 +53,9 @@ class ParticipantController extends AbstractController
     public function myProfile(
         Request $request,
         EntityManagerInterface $entityManager,
-        #[CurrentUser] ?Participant $participant
+        #[CurrentUser] ?Participant $participant,
+        ImageManagerService $imageManagerService,
+        PasswordManagerService $passwordManagerService
     ): Response
     {
         $picture = 'default.png';
@@ -81,7 +75,7 @@ class ParticipantController extends AbstractController
             // if an image has been added to the form, start image management
             if (!empty($pictureFile)) {
                 try {
-                    $this->imageManagerService->manageImage($participant, $pictureFile);
+                    $imageManagerService->manageImage($participant, $pictureFile);
                 } catch (FileException $e) {
                     $this->addFlash('danger', "Erreur lors du téléchargement de l'image !");
 
@@ -95,7 +89,7 @@ class ParticipantController extends AbstractController
                 $plainPassword = $form->get('plainPassword')->getData();
                 $confirmPassword = $form->get('confirmPassword')->getData();
                 try {
-                    $this->passwordManagerService->managePassword($participant, $currentPassword, $plainPassword, $confirmPassword);
+                    $passwordManagerService->managePassword($participant, $currentPassword, $plainPassword, $confirmPassword);
                 } catch (\RuntimeException $e) {
                     $this->addFlash('danger', $e->getMessage());
 
