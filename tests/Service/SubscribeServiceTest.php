@@ -7,7 +7,6 @@ use App\Entity\State;
 use App\Entity\Subscribe;
 use App\Entity\Trip;
 use App\Repository\SubscribeRepository;
-use App\Repository\TripRepository;
 use App\Service\SubscribeService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -19,12 +18,10 @@ class SubscribeServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $tripRepository = $this->createMock(TripRepository::class);
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $this->subscribeRepository = $this->createMock(SubscribeRepository::class);
 
         $this->subscribeService = new SubscribeService(
-            $tripRepository,
             $entityManager,
             $this->subscribeRepository
         );
