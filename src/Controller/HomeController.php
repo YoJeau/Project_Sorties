@@ -19,7 +19,6 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 class HomeController extends AbstractController
 {
     public function __construct(
-        #[CurrentUser] private readonly ?Participant $currentParticipant,
         private readonly SiteRepository $siteRepository,
         private readonly TripRepository $tripRepository,
         private readonly ActionService $actionService,
@@ -32,9 +31,9 @@ class HomeController extends AbstractController
      * @throws \DateMalformedStringException
      */
     #[Route('/', name: 'app_home', methods: ['GET', 'POST'])]
-    public function index(Request $request, PaginatorInterface $paginator): Response
+    public function index(#[CurrentUser] ?Participant $currentParticipant, Request $request, PaginatorInterface $paginator): Response
     {
-        if (!$this->currentParticipant) return $this->redirectToRoute('app_login');
+        if (is_null($currentParticipant)) return $this->redirectToRoute('app_login');
 
         $sites = $this->siteRepository->findAll();
         $filters = [];
@@ -60,7 +59,7 @@ class HomeController extends AbstractController
             $trips = $this->tripRepository->findNonArchivedTrips();
             $trips = $paginator->paginate($trips, $request->query->getInt('page', 1), 10);
         }
-        $actions = $this->actionService->determineAction($this->currentParticipant, $trips);
+        $actions = $this->actionService->determineAction($currentParticipant, $trips);
         $stateColors = [
             State::STATE_COMPLETED => "table-dark",
             State::STATE_OPEN => "table-light",
