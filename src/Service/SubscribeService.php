@@ -9,13 +9,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class SubscribeService
 {
-    private EntityManagerInterface $entityManager;
-    private SubscribeRepository $subscribeRepository;
-
-    public function __construct(EntityManagerInterface $entityManager, SubscribeRepository $subscribeRepository){
-        $this->entityManager = $entityManager;
-        $this->subscribeRepository = $subscribeRepository;
-    }
+    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly SubscribeRepository $subscribeRepository)
+    { }
 
     public function checkSubscribe($trip, $user): bool
     {
