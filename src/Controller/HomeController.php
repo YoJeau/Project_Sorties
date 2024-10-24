@@ -34,7 +34,7 @@ class HomeController extends AbstractController
     #[Route('/', name: 'app_home', methods: ['GET', 'POST'])]
     public function index(Request $request, PaginatorInterface $paginator): Response
     {
-        if (!$this->getUser()) return $this->redirectToRoute('app_login');
+        if (!$this->currentParticipant) return $this->redirectToRoute('app_login');
 
         $sites = $this->siteRepository->findAll();
         $filters = [];
