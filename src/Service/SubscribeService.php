@@ -86,7 +86,7 @@ class SubscribeService
         return $countSubscribe < $maxSubscribe; // Renvoie true si le maximum n'est pas atteint
     }
 
-    private function checkState(Trip $trip): bool
+    public function checkState(Trip $trip): bool
     {
         $state = $trip->getTriState()->getStaLabel();
         if (

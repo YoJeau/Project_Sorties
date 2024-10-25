@@ -72,7 +72,7 @@ class SubscribeServiceTest extends TestCase
         $state = $this->createMock(State::class);
         $state->method('getStaLabel')->willReturn(State::STATE_CREATED);
 
-        $result = $this->CheckUnsubscribeRequirements($state);
+        $result = $this->checkUnsubscribeRequirements($state);
 
         $this->assertFalse($result);
     }
@@ -88,7 +88,7 @@ class SubscribeServiceTest extends TestCase
         $state = $this->createMock(State::class);
         $state->method('getStaLabel')->willReturn(State::STATE_OPEN);
 
-        $result = $this->CheckUnsubscribeRequirements($state);
+        $result = $this->checkUnsubscribeRequirements($state);
 
         $this->assertTrue($result);
     }
@@ -104,7 +104,7 @@ class SubscribeServiceTest extends TestCase
         $state = $this->createMock(State::class);
         $state->method('getStaLabel')->willReturn(State::STATE_CLOSED);
 
-        $result = $this->CheckUnsubscribeRequirements($state);
+        $result = $this->checkUnsubscribeRequirements($state);
 
         $this->assertTrue($result);
     }
@@ -120,7 +120,7 @@ class SubscribeServiceTest extends TestCase
         $state = $this->createMock(State::class);
         $state->method('getStaLabel')->willReturn(State::STATE_CLOSED_SUBSCRIBE);
 
-        $result = $this->CheckUnsubscribeRequirements($state);
+        $result = $this->checkUnsubscribeRequirements($state);
 
         $this->assertTrue($result);
     }
@@ -136,7 +136,7 @@ class SubscribeServiceTest extends TestCase
         $state = $this->createMock(State::class);
         $state->method('getStaLabel')->willReturn(State::STATE_IN_PROGRESS);
 
-        $result = $this->CheckUnsubscribeRequirements($state);
+        $result = $this->checkUnsubscribeRequirements($state);
 
         $this->assertFalse($result);
     }
@@ -152,7 +152,7 @@ class SubscribeServiceTest extends TestCase
         $state = $this->createMock(State::class);
         $state->method('getStaLabel')->willReturn(State::STATE_COMPLETED);
 
-        $result = $this->CheckUnsubscribeRequirements($state);
+        $result = $this->checkUnsubscribeRequirements($state);
 
         $this->assertFalse($result);
     }
@@ -168,7 +168,7 @@ class SubscribeServiceTest extends TestCase
         $state = $this->createMock(State::class);
         $state->method('getStaLabel')->willReturn(State::STATE_ARCHIVED);
 
-        $result = $this->CheckUnsubscribeRequirements($state);
+        $result = $this->checkUnsubscribeRequirements($state);
 
         $this->assertFalse($result);
     }
@@ -184,7 +184,7 @@ class SubscribeServiceTest extends TestCase
         $state = $this->createMock(State::class);
         $state->method('getStaLabel')->willReturn(State::STATE_CANCELLED);
 
-        $result = $this->CheckUnsubscribeRequirements($state);
+        $result = $this->checkUnsubscribeRequirements($state);
 
         $this->assertFalse($result);
     }
@@ -195,7 +195,7 @@ class SubscribeServiceTest extends TestCase
      * @param State $state The state of the trip to be tested.
      * @return bool
      */
-    private function CheckUnsubscribeRequirements(State $state): bool
+    private function checkUnsubscribeRequirements(State $state): bool
     {
         $trip = $this->createMock(Trip::class);
         $participant = $this->createMock(Participant::class);
