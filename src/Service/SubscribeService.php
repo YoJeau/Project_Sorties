@@ -2,8 +2,10 @@
 
 namespace App\Service;
 
+use App\Entity\Participant;
 use App\Entity\State;
 use App\Entity\Subscribe;
+use App\Entity\Trip;
 use App\Repository\SubscribeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -33,7 +35,7 @@ class SubscribeService
         return false;
     }
 
-    public function checkUnsubscribe($trip, $user): bool
+    public function checkUnsubscribe(Trip $trip, Participant $user): bool
     {
         $isPossible = true;
 
@@ -44,7 +46,7 @@ class SubscribeService
         ]);
 
         // true si existe sinon false
-        $isPossible &= $subscribe !== null;
+        $isPossible &= !is_null($subscribe);
         // si l'état de la sortie permet encore de se désincrire
         $isPossible &= $this->checkState($trip);
 
@@ -84,10 +86,16 @@ class SubscribeService
         return $countSubscribe < $maxSubscribe; // Renvoie true si le maximum n'est pas atteint
     }
 
-    public function checkState($trip): bool
+    private function checkState(Trip $trip): bool
     {
         $state = $trip->getTriState()->getStaLabel();
-        if($state === State::STATE_OPEN || $state === State::STATE_CLOSED || $state === State::STATE_CLOSED_SUBSCRIBE) return true;
+        if (
+            $state === State::STATE_OPEN ||
+            $state === State::STATE_CLOSED ||
+            $state === State::STATE_CLOSED_SUBSCRIBE
+        ) {
+            return true;
+        }
         return false;
     }
 }

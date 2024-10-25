@@ -2,11 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Participant;
 use App\Entity\Trip;
 use App\Service\SubscribeService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class SubscribeController extends AbstractController
 {
@@ -26,11 +29,11 @@ class SubscribeController extends AbstractController
     }
 
     #[Route('/unsubscribe/{id}', name: 'app_subscribe_delete')]
-    public function unsubscribe(Trip $trip,Request $request){
-        $user = $this->getUser();
-        if($this->subcribeService->checkUnsubscribe($trip,$user)){
+    public function unsubscribe(#[CurrentUser] ?Participant $currentParticipant, Trip $trip): Response
+    {
+        if ($this->subcribeService->checkUnsubscribe($trip, $currentParticipant)) {
             $this->addFlash('success','Vous vous êtes désinscrit avec succès');
-        } else{
+        } else {
             $this->addFlash('danger','Les desistements ne sont plus disponibles');
         }
         return $this->redirectToRoute('app_home');
